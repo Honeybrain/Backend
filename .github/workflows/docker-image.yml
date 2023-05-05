@@ -1,0 +1,23 @@
+name: Docker Build
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker
+      run: docker build -t ${{ secrets.DOCKER_USER }}/dashboard_back .
+    - name: Push the Docker
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+        docker push $DOCKER_USER/dashboard_back
