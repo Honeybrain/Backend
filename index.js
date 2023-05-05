@@ -1,22 +1,36 @@
-const express = require('express')
-
-const user = require('./routes/user.js')
-
-const honeypot = require('./routes/honeypot.js')
-
-const app = express()
-
-const hostname = "127.0.0.1";
-const port = 8000;
-
-app.use("/user", user);
-app.use("/honeypot", honeypot);
+import userRouter from "./routes/user.js";
+import honeypotRouter from "./routes/honeypot.js";
+import express from 'express';
 
 
-// Démarrer le serveur et écouter un port donné
-const PORT = 8000;
+const app = express();
+app.use(express.urlencoded({ extended: false }));
+app.use('/honeypot', honeypotRouter);
+app.use("/user", userRouter);
+app.use("/honeypot", honeypotRouter);
 
-app.listen(PORT, () => {
-  // Fonction éxecutée lorsque l'application a démarré
-  console.log(`Serveur démarré : http://${hostname}:${PORT}`)
-})
+// Home route
+app.get('/', (req, res) => {
+  res.send('Welcome to our website!');
+});
+
+// About route
+app.get('/about', (req, res) => {
+  res.send('This is our company information.');
+});
+
+// Contact route
+app.get('/contact', (req, res) => {
+  res.send('Please fill out the contact form to get in touch with us.');
+});
+
+// 404 route
+app.use((req, res) => {
+  res.status(404).send('Page not found.');
+});
+
+// Start server
+app.listen(8000, () => {
+  console.log('Server started on port 8000');
+});
+
