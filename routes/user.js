@@ -8,7 +8,7 @@ const firebase = initializeApp(firebaseConfig);
 const auth = getAuth(firebase);
 let user = null;
 // Login route
-userRouter.get('/login', (req, res) => {
+userRouter.post('/login', (req, res) => {
   if (!req.body)
     res.send('Please enter your signup credentials.');
   const password = req.body.password;
