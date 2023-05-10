@@ -1,0 +1,19 @@
+# Files and directories to exclude from the Docker build context
+node_modules
+*.log
+*.pid
+*.swp
+.DS_Store
+.vscode
+
+# Build artifacts to exclude
+/build
+/dist
+/out
+/public
+
+# Miscellaneous files and directories to exclude
+coverage
+.git
+.idea
+.nyc_output

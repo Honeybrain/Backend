@@ -1,11 +1,11 @@
-FROM node:14-alpine
+FROM node:18.16.0
 
-WORKDIR /back
-COPY package*.json ./
+RUN mkdir -p /app
+WORKDIR /app
+COPY . /app/
+
 RUN npm install
-
-COPY . .
 
 EXPOSE 8000
 
-CMD ["node", "index.js"]
+CMD ["node", "./index.js"]
