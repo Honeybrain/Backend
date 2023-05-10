@@ -12,6 +12,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Create config file
+      env:
+        FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+      run: |
+        echo $FIREBASE_CONFIG > ./firebaseConfig.json
     - name: Build the Docker
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
