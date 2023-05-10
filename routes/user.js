@@ -9,10 +9,10 @@ const auth = getAuth(firebase);
 let user = null;
 // Login route
 userRouter.get('/login', (req, res) => {
-  if (!req.query)
+  if (!req.body)
     res.send('Please enter your signup credentials.');
-  const password = req.query.password;
-  const email = req.query.email;
+  const password = req.body.password;
+  const email = req.body.email;
 
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
@@ -27,12 +27,13 @@ userRouter.get('/login', (req, res) => {
 });
 
 // Signup route
-userRouter.get('/signup', (req, res) => {
-  if (!req.query)
+userRouter.post('/signup', (req, res) => {
+  if (!req.body)
     res.send('Please enter your signup credentials.');
-  const password = req.query.password;
-  const email = req.query.email;
+  const password = req.body.password;
+  const email = req.body.email;
 
+  console.log(req.body);
   createUserWithEmailAndPassword(auth, email, password)
   .then((userRecord) => {
     // user created successfully
@@ -44,7 +45,7 @@ userRouter.get('/signup', (req, res) => {
   });
 });
 
-// Signup route
+// Signout route
 userRouter.get('/signout', (req, res) => {
   user = null;
   auth.signOut()
