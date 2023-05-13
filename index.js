@@ -1,13 +1,18 @@
 import userRouter from "./routes/user.js";
 import honeypotRouter from "./routes/honeypot.js";
 import express from 'express';
-
+import cors from 'cors';
+import bodyParser from 'body-parser';
 
 const app = express();
+// Express conf
 app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cors());
+
+// Routers
 app.use('/honeypot', honeypotRouter);
 app.use("/user", userRouter);
-app.use("/honeypot", honeypotRouter);
 
 // Home route
 app.get('/', (req, res) => {
