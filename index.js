@@ -3,12 +3,14 @@ import honeypotRouter from "./routes/honeypot.js";
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import morgan from 'morgan';
 
 const app = express();
 // Express conf
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
+app.use(morgan('dev'));
 
 // Routers
 app.use('/honeypot', honeypotRouter);
