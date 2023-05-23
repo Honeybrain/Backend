@@ -35,9 +35,10 @@ userRouter.post('/signup', (req, res) => {
 
   console.log(req.body);
   createUserWithEmailAndPassword(auth, email, password)
-  .then((userRecord) => {
+  .then((userCredential) => {
     // user created successfully
-    res.status(200).send('User created successfully');
+    user = userCredential.user;
+    res.status(200).json({ message: 'User created successfully', user: user });
   })
   .catch((error) => {
     // error creating user
