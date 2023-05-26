@@ -62,6 +62,12 @@ honeypotRouter.post('/blacklist', (req, res) => {
     });
 });
 
+honeypotRouter.get('/logs', (req, res) => {
+    // Define the path of the log file
+    const data = fs.readFileSync(path.join(process.cwd(), '/honeypot/fast.log'), 'utf8');
+    res.send(data);
+});
+
 // Route to fetch data of the honeypot
 honeypotRouter.post('/fetch-data', (req, res) => {
     const data = req.body;
