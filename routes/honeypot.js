@@ -11,9 +11,54 @@ honeypotRouter.get('/', (req, res) => {
     res.send('routes for the honeypots !');
 });
 
-// Route to whitlist users
-honeypotRouter.get('/whitelist', (req, res) => {
-    res.send('please send you whitelist here !');
+// Route to remove IP from blacklist
+honeypotRouter.post('/whitelist', (req, res) => {
+    // Extract the IP address from the request body
+    const { ip } = req.body;
+  
+    if (!ip) {
+        return res.status(400).json({ error: 'IP address is required' });
+    }
+  
+    // Read the file
+    const filePath = path.join(process.cwd(), '/honeypot/block.conf');
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to read block.conf file' });
+        }
+  
+        // Remove the line containing the IP address
+        const newData = data.replace(new RegExp(`deny ${ip};\n`, 'g'), '');
+    
+        // Write the updated content back to the file
+        fs.writeFile(filePath, newData, (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Failed to update block.conf file' });
+            }
+
+            // Execute the unbanip command
+            const cmd = `docker exec fail2ban fail2ban-client set nginx-honeypot unbanip ${ip}`;
+            exec(cmd, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`exec error: ${error}`);
+                    return res.status(500).json({ error: 'Failed to execute unbanip nginx-honeypot' });
+                }
+            });
+
+            const cmd2 = `docker exec fail2ban fail2ban-client set iptables-honeypot unbanip ${ip}`;
+            exec(cmd2, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`exec error: ${error}`);
+                    return res.status(500).json({ error: 'Failed to execute unbanip iptables-honeypot' });
+                }
+            });
+
+            // On success, return a success message
+            res.json({ message: `IP ${ip} removed from the blacklist and unblocked successfully` });
+        });
+    });
 });
  
 // Route to get blacklisted IP
@@ -42,25 +87,36 @@ honeypotRouter.post('/blacklist', (req, res) => {
     
     // Extract IP address from request body
     const { ip } = req.body;
-
+  
     if (!ip) {
         return res.status(400).json({ error: 'IP address is required' });
     }
-
+  
     // Define the command
     const cmd = `docker exec fail2ban fail2ban-client set nginx-honeypot banip ${ip}`;
-
+  
     // Execute the command
     exec(cmd, (error, stdout, stderr) => {
-    if (error) {
-        console.error(`exec error: ${error}`);
-        return res.status(500).json({ error: 'Failed to execute command' });
-    }
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return res.status(500).json({ error: 'Failed to execute nginx-honeypot banip' });
+        }
+    });
+
+    const cmd2 = `docker exec fail2ban fail2ban-client set iptables-honeypot banip ${ip}`;
+  
+    // Execute the command
+    exec(cmd2, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return res.status(500).json({ error: 'Failed to execute iptables-honeypot banip' });
+        }
+    });
 
     // On success, return a message
     res.json({ message: `IP ${ip} banned successfully` });
-    });
 });
+  
 
 honeypotRouter.get('/logs', (req, res) => {
     // Define the path of the log file
