@@ -68,6 +68,44 @@ honeypotRouter.get('/logs', (req, res) => {
     res.send(data);
 });
 
+honeypotRouter.get('/containers', (req, res) => {
+    exec('docker network inspect build_honeypot_network --format "{{json .Containers}}"', (err, stdout1, stderr) => {
+        if (err) {
+            console.error(`exec error: ${err}`);
+            return;
+        }
+
+        const networkContainers = JSON.parse(stdout1);
+        const containerIds = Object.keys(networkContainers);
+
+        exec('docker ps --format \'{"ID":"{{.ID}}", "Image":"{{.Image}}", "Command":{{json .Command}}, "CreatedSince":"{{.RunningFor}}", "Status":"{{.Status}}", "Ports":"{{.Ports}}", "Names":"{{.Names}}"}\'', (err, stdout2, stderr) => {
+            if (err) {
+                console.error(`exec error: ${err}`);
+                return;
+            }
+
+            const runningContainers = JSON.parse(`[${stdout2.split("\n").filter(Boolean).join(",")}]`);
+            const honeypotContainers = runningContainers.filter(container => containerIds.some(id => id.startsWith(container.ID)));
+
+            const containersData = honeypotContainers.map(container => {
+                // Find the key in networkContainers that starts with the container ID
+                const networkContainerKey = Object.keys(networkContainers).find(key => key.startsWith(container.ID));
+
+                // Use the found key to access networkContainers
+                const networkContainer = networkContainerKey ? networkContainers[networkContainerKey] : undefined;
+
+                return {
+                    name: container.Names,
+                    status: container.Status,
+                    ip: networkContainer ? networkContainer.IPv4Address : 'Not found',
+                };
+            });
+
+            res.send(containersData);
+        });
+    });
+});
+
 // Route to fetch data of the honeypot
 honeypotRouter.post('/fetch-data', (req, res) => {
     const data = req.body;
