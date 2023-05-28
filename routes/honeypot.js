@@ -125,7 +125,7 @@ honeypotRouter.get('/logs', (req, res) => {
 });
 
 honeypotRouter.get('/containers', (req, res) => {
-    exec('docker network inspect build_honeypot_network --format "{{json .Containers}}"', (err, stdout1, stderr) => {
+    exec('docker network inspect honeypot_honeypot_network --format "{{json .Containers}}"', (err, stdout1, stderr) => {
         if (err) {
             console.error(`exec error: ${err}`);
             return;
