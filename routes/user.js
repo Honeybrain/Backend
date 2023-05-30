@@ -1,12 +1,14 @@
 import express from 'express';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import firebaseConfig from "../firebaseConfig.json" assert { type: "json" };
 import {initializeApp} from 'firebase/app';
+import verifyToken from "./middleware.js";
 
 const userRouter = express.Router();
 const firebase = initializeApp(firebaseConfig);
 const auth = getAuth(firebase);
 let user = null;
+
 // Login route
 userRouter.post('/login', (req, res) => {
   if (!req.body)
@@ -18,7 +20,7 @@ userRouter.post('/login', (req, res) => {
     .then((userCredential) => {
       user = userCredential.user;
       // user signed in successfully
-      res.status(200).send('User signed in successfully');
+      res.status(200).json({ message: 'User signed in successfully', user: user });
     })
     .catch((error) => {
       // error signing in user

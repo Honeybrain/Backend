@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
+import verifyToken from "./routes/middleware.js";
 
 const app = express();
 // Express conf
@@ -16,6 +17,12 @@ app.use(morgan('dev'));
 app.use('/honeypot', honeypotRouter);
 app.use("/user", userRouter);
 
+//middleware
+
+// test route
+app.get('/test', verifyToken, (req, res) => {
+  res.send('This is a test route.');
+});
 // Home route
 app.get('/', (req, res) => {
   res.send('Welcome to our website!');
