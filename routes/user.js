@@ -2,7 +2,6 @@ import express from 'express';
 import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import firebaseConfig from "../firebaseConfig.json" assert { type: "json" };
 import {initializeApp} from 'firebase/app';
-import verifyToken from "./middleware.js";
 
 const userRouter = express.Router();
 const firebase = initializeApp(firebaseConfig);
