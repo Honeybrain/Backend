@@ -48,7 +48,7 @@ userRouter.post('/signup', (req, res) => {
 });
 
 // Signout route
-userRouter.get('/signout', (req, res) => {
+userRouter.post('/signout', (req, res) => {
   user = null;
   auth.signOut()
   .then(() => {
