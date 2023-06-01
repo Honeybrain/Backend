@@ -1,5 +1,5 @@
 import express from 'express';
-import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail} from "firebase/auth";
 import firebaseConfig from "../firebaseConfig.json" assert { type: "json" };
 import {initializeApp} from 'firebase/app';
 
@@ -25,6 +25,24 @@ userRouter.post('/login', (req, res) => {
       // error signing in user
       res.status(400).send(`Error signing in user: ${error}`);
     });
+});
+
+// Change Passsword
+userRouter.post('/resetPassword', (req, res) => {
+  if (!req.body)
+    res.send('Please enter your signup credentials.');
+  const email = req.body.email;
+
+  console.log(req.body);
+  sendPasswordResetEmail(auth, email)
+  .then((userCredential) => {
+    // email sent successfully
+    res.status(200).json({ message: 'Reset email sent successfully'});
+  })
+  .catch((error) => {
+    // error creating user
+    res.status(400).send(`Error creating user: ${error}`);
+  });
 });
 
 // Signup route
