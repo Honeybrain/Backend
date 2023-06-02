@@ -18,11 +18,13 @@ userRouter.post('/login', (req, res) => {
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       user = userCredential.user;
+      const token = user.stsTokenManager.accessToken;
       // user signed in successfully
-      res.status(200).json({ message: 'User signed in successfully', user: user });
+      res.status(200).json({ message: 'User signed in successfully', token: token });
     })
     .catch((error) => {
       // error signing in user
+      console.log(error);
       res.status(400).send(`Error signing in user: ${error}`);
     });
 });
