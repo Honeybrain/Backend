@@ -141,7 +141,7 @@ honeypotRouter.get('/containers', (req, res) => {
             }
 
             const allContainers = JSON.parse(`[${stdout2.split("\n").filter(Boolean).join(",")}]`);
-            const buildContainers = allContainers.filter(container => container.Names.startsWith('build-'));
+            const buildContainers = allContainers.filter(container => container.Names.startsWith('honeypot_'));
 
             const containersData = buildContainers.map(container => {
                 const networkContainerKey = Object.keys(networkContainers).find(key => key.startsWith(container.ID));
