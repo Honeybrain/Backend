@@ -9,8 +9,9 @@ admin.initializeApp(firebaseConfig)
 
 
 const verifyToken = async (req, res, next) => {
-  if (req.headers.authorization === undefined)
-    return res.status(401).json({ error: 'Unauthorized' });
+  if (req.headers.authorization === undefined) {
+    return res.status(401).json({ error: 'Unauthorized, no token' });
+  }
   const idToken = req.headers.authorization;
   console.log(idToken);
   // Verify the ID token

@@ -2,6 +2,7 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
+import verifyToken from "./routes/middleware.js";
 
 const honeypotRouter = express.Router();
 honeypotRouter.use(express.urlencoded({ extended: false }));
@@ -12,7 +13,7 @@ honeypotRouter.get('/', (req, res) => {
 });
 
 // Route to remove IP from blacklist
-honeypotRouter.post('/whitelist', (req, res) => {
+honeypotRouter.post('/whitelist', verifyToken, (req, res) => {
     // Extract the IP address from the request body
     const { ip } = req.body;
 
@@ -62,7 +63,7 @@ honeypotRouter.post('/whitelist', (req, res) => {
 });
 
 // Route to get blacklisted IP
-honeypotRouter.get('/blacklist', (req, res) => {
+honeypotRouter.get('/blacklist', verifyToken, (req, res) => {
     // Read the file
     const data = fs.readFileSync(path.join(process.cwd(), '/honeypot/block.conf'), 'utf8');
 
@@ -82,7 +83,7 @@ honeypotRouter.get('/blacklist', (req, res) => {
 });
 
 // Route to get blacklisted IP
-honeypotRouter.post('/blacklist', (req, res) => {
+honeypotRouter.post('/blacklist', verifyToken, (req, res) => {
     console.log(res.body);
 
     // Extract IP address from request body
@@ -118,13 +119,13 @@ honeypotRouter.post('/blacklist', (req, res) => {
 });
 
 
-honeypotRouter.get('/logs', (req, res) => {
+honeypotRouter.get('/logs', verifyToken, (req, res) => {
     // Define the path of the log file
     const data = fs.readFileSync(path.join(process.cwd(), '/honeypot/fast.log'), 'utf8');
     res.send(data);
 });
 
-honeypotRouter.get('/containers', (req, res) => {
+honeypotRouter.get('/containers', verifyToken, (req, res) => {
     exec('docker network inspect honeypot_network --format "{{json .Containers}}"', (err, stdout1, stderr) => {
         if (err) {
             console.error(`exec error: ${err}`);
@@ -160,7 +161,7 @@ honeypotRouter.get('/containers', (req, res) => {
 });
 
 // Route to fetch data of the honeypot
-honeypotRouter.post('/fetch-data', (req, res) => {
+honeypotRouter.post('/fetch-data', verifyToken, (req, res) => {
     const data = req.body;
     console.log(data);
     if (data && data.length > 0) {
@@ -171,7 +172,7 @@ honeypotRouter.post('/fetch-data', (req, res) => {
 });
 
 // Route to fetch the owner connections of the honeypot
-honeypotRouter.post('/fetch-owner-connection', (req, res) => {
+honeypotRouter.post('/fetch-owner-connection', verifyToken, (req, res) => {
     const data = req.body;
     console.log(data);
     if (data && data.length > 0) {
@@ -182,7 +183,7 @@ honeypotRouter.post('/fetch-owner-connection', (req, res) => {
 });
 
 // Route to update the settings of the honeypot of the honeypot
-honeypotRouter.post('/update-settings', (req, res) => {
+honeypotRouter.post('/update-settings', verifyToken, (req, res) => {
     const data = JSON.stringify("data will be here");
     res.send(data);
 });
