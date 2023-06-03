@@ -1,5 +1,5 @@
 import express from 'express';
-import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail} from "firebase/auth";
+import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateEmail} from "firebase/auth";
 import firebaseConfig from "../firebaseConfig.json" assert { type: "json" };
 import {initializeApp} from 'firebase/app';
 
@@ -38,11 +38,13 @@ userRouter.post('/resetPassword', (req, res) => {
   console.log(req.body);
   sendPasswordResetEmail(auth, email)
   .then((userCredential) => {
+    //user = userCredential.user;
     // email sent successfully
+    console.log(userCredential);
     res.status(200).json({ message: 'Reset email sent successfully'});
   })
   .catch((error) => {
-    // error creating user
+    // error changing password
     res.status(400).send(`Error creating user: ${error}`);
   });
 });
@@ -78,6 +80,25 @@ userRouter.post('/signout', (req, res) => {
   .catch((error) => {
     // error signing out user
     res.status(400).send(`Error signing out user: ${error}`);
+  });
+});
+
+// Change Email route
+
+userRouter.post('/changeEmail', (req, res) => {
+  if (!req.body)
+    res.send('Please enter your signup credentials.');
+  const newEmail = req.body.newEmail;
+
+  console.log(newEmail);
+  console.log(auth.currentUser)
+  updateEmail(auth.currentUser, newEmail)
+  .then(() => {
+    res.status(200).json({ message: 'Change successfully'});
+  })
+  .catch((error) => {
+    // error changing email
+    res.status(400).send(`Error creating user: ${error}`);
   });
 });
 
