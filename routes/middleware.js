@@ -12,7 +12,8 @@ const verifyToken = async (req, res, next) => {
   if (req.headers.authorization === undefined) {
     return res.status(401).json({ error: 'Unauthorized, no token' });
   }
-  const idToken = req.headers.authorization;
+  // Extract the token without the Bearer prefix
+  const idToken = req.headers.authorization.split(' ')[1];
   console.log(idToken);
   // Verify the ID token
   admin.auth().verifyIdToken(idToken).then((decodedToken) => {

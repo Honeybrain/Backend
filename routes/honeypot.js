@@ -2,7 +2,7 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
-import verifyToken from "./routes/middleware.js";
+import verifyToken from "./middleware.js";
 
 const honeypotRouter = express.Router();
 honeypotRouter.use(express.urlencoded({ extended: false }));
