@@ -118,13 +118,6 @@ honeypotRouter.post('/blacklist', verifyToken, (req, res) => {
     res.json({ message: `IP ${ip} banned successfully` });
 });
 
-
-honeypotRouter.get('/logs', verifyToken, (req, res) => {
-    // Define the path of the log file
-    const data = fs.readFileSync(path.join(process.cwd(), '/honeypot/fast.log'), 'utf8');
-    res.send(data);
-});
-
 honeypotRouter.get('/containers', verifyToken, (req, res) => {
     exec('docker network inspect honeypot_network --format "{{json .Containers}}"', (err, stdout1, stderr) => {
         if (err) {

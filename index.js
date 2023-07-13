@@ -6,6 +6,8 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import verifyToken from "./routes/middleware.js";
 
+import './server.js';
+
 const app = express();
 // Express conf
 app.use(express.urlencoded({ extended: false }));
