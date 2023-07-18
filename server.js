@@ -1,5 +1,7 @@
-var services = require('./proto/js/logs_grpc_pb');
+var logs_services = require('./proto/js/logs_grpc_pb');
+var hello_services = require('./proto/js/helloworld_grpc_pb');
 var { StreamLogs } = require('./services/logs');
+var { sayHello } = require('./services/hello');
 var GrpcServer = require('./GrpcServer');
 
 /**
@@ -8,7 +10,8 @@ var GrpcServer = require('./GrpcServer');
  */
 function main() {
   var server = new GrpcServer();
-  server.addService(services.LogsService, {StreamLogs : StreamLogs});
+  server.addService(logs_services.LogsService, {StreamLogs : StreamLogs});
+  server.addService(hello_services.GreeterService, {sayHello : sayHello});
   server.start(50051);
 }
 
