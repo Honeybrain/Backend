@@ -1,27 +1,26 @@
-import fs from 'fs';
-import logs from '../protos/js/logs_grpc_pb.js';
-import { LogResponse } from '../protos/js/logs_pb.js';
+var messages = require('../proto/js/logs_pb');
+var fs = require('fs');
 
-let watcher;
+/**
+ * Implements the StreamLogs RPC method.
+ */
+function StreamLogs(call) {
+  let watcher;
 
-const handlers = {
-  StreamLogs: (call) => {
-    if (watcher) {
-      watcher.close();
-    }
-
-    watcher = fs.watch('/honeypot/fast.log', (eventType, filename) => {
-      if (eventType === 'change') {
-        const logContent = fs.readFileSync('/honeypot/fast.log', 'utf8');
-        const response = new LogResponse();
-        response.setContent(logContent);
-        call.write(response);
-      }
-    });
+  if (watcher) {
+    watcher.close();
   }
-};
 
-export default {
-  service: logs.LogService,
-  handlers
+  watcher = fs.watch('/honeypot/fast.log', (eventType, filename) => {
+    if (eventType === 'change') {
+      const logContent = fs.readFileSync('/honeypot/fast.log', 'utf8');
+      const response = new messages.LogReply();
+      response.setContent(logContent);
+      call.write(response);
+    }
+  });
+}
+
+module.exports = {
+  StreamLogs: StreamLogs
 };

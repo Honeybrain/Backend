@@ -106,3 +106,5 @@ dist
 
 #apikey
 firebaseConfig.json
+yarn.lock
+proto/js

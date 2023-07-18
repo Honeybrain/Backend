@@ -1,11 +1,15 @@
-import grpc from '@grpc/grpc-js';
-import logs from './services/logs.js';
+var services = require('./proto/js/logs_grpc_pb');
+var { StreamLogs } = require('./services/logs');
+var GrpcServer = require('./GrpcServer');
 
-const server = new grpc.Server();
+/**
+ * Starts an RPC server that receives requests for the Logs service at the
+ * server port
+ */
+function main() {
+  var server = new GrpcServer();
+  server.addService(services.LogsService, {StreamLogs : StreamLogs});
+  server.start(50051);
+}
 
-server.addService(logs.service, logs.handlers);
-
-server.bindAsync('0.0.0.0:50051', grpc.ServerCredentials.createInsecure(), () => {
-  console.log('Server running at http://0.0.0.0:50051');
-  server.start();
-});
+main();

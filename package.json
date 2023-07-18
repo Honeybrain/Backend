@@ -1,21 +1,16 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "type": "module",
+  "main": "server.js",
+  "repository": "git@github.com:Honeybrain/Backend.git",
+  "author": "Valentin Charbonnier <valentinbreiz@gmail.com>",
+  "license": "MIT",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "@grpc/grpc-js": "^1.8.17",
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "firebase": "^9.22.1",
-    "firebase-admin": "^11.8.0",
-    "morgan": "^1.10.0"
+    "@grpc/grpc-js": "^1.8.18",
+    "google-protobuf": "^3.21.2",
+    "grpc-tools": "^1.12.4"
   }
 }
