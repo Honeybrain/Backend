@@ -3,7 +3,7 @@ var messages = require('../proto/js/logs_pb');
 /**
  * Implements the StreamLogs RPC method.
  */
-function streamLogs(call, callback) {
+function streamLogs(call) {
   console.log("hella");
   call.on('data', function(feature) {
     console.log("data");
@@ -22,7 +22,8 @@ function streamLogs(call, callback) {
   });
   const reply = new messages.LogReply();
   reply.setContent('feur');
-  callback(null, reply);
+  call.write(reply);
+  call.end();
 }
 
 module.exports = {
