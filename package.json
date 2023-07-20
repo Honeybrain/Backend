@@ -1,12 +1,13 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "src/server.js",
   "repository": "git@github.com:Honeybrain/Backend.git",
   "author": "Valentin Charbonnier <valentinbreiz@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "node server.js"
+    "start": "node src/server.js",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.8.18",

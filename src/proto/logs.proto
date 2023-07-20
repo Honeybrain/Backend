@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package logs;
+
 service Logs {
   rpc StreamLogs (LogRequest) returns (stream LogReply) {}
 }
