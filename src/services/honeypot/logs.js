@@ -1,4 +1,4 @@
-const messages = require('../proto/js/logs_pb');
+const messages = require('../../proto/js/logs_pb');
 const chokidar = require('chokidar');
 const fs = require('fs');
 
