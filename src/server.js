@@ -3,7 +3,7 @@ const hello_services = require('./proto/js/helloworld_grpc_pb');
 const user_services = require('./proto/js/user_grpc_pb');
 const { streamLogs } = require('./services/logs');
 const { sayHello } = require('./services/hello');
-const { SignIn, SignUp, SignOut, ResetPassword, ChangeEmail } = require('./services/user');
+const { signIn, signUp, signOut, resetPassword, changeEmail } = require('./services/user');
 const GrpcServer = require('./grpcServer');
 
 /**
@@ -15,11 +15,11 @@ function main() {
 
   //GRPC user service
   server.addService(user_services.UserService, {
-    SignIn: SignIn,
-    SignUp: SignUp,
-    SignOut: SignOut,
-    ResetPassword: ResetPassword,
-    ChangeEmail: ChangeEmail
+    signIn: signIn,
+    signUp: signUp,
+    signOut: signOut,
+    resetPassword: resetPassword,
+    changeEmail: changeEmail
   });
 
   //GRPC stream log service

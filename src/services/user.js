@@ -7,7 +7,7 @@ const firebase = initializeApp(firebaseConfig);
 const auth = getAuth(firebase);
 let user = null;
 
-function SignIn(call, callback) {
+function signIn(call, callback) {
     const email = call.request.getEmail();
     const password = call.request.getPassword();
 
@@ -26,7 +26,7 @@ function SignIn(call, callback) {
         });
 }
 
-function SignUp(call, callback) {
+function signUp(call, callback) {
     const email = call.request.getEmail();
     const password = call.request.getPassword();
 
@@ -44,7 +44,7 @@ function SignUp(call, callback) {
         });
 }
 
-function SignOut(call, callback) {
+function signOut(call, callback) {
     user = null;
     auth.signOut()
         .then(() => {
@@ -57,7 +57,7 @@ function SignOut(call, callback) {
         });
 }
 
-function ResetPassword(call, callback) {
+function resetPassword(call, callback) {
     const email = call.request.getEmail();
 
     sendPasswordResetEmail(auth, email)
@@ -71,7 +71,7 @@ function ResetPassword(call, callback) {
         });
 }
 
-function ChangeEmail(call, callback) {
+function changeEmail(call, callback) {
     const newEmail = call.request.getEmail();
 
     updateEmail(auth.currentUser, newEmail)
@@ -86,9 +86,9 @@ function ChangeEmail(call, callback) {
 }
 
 module.exports = {
-    SignIn: SignIn,
-    SignUp: SignUp,
-    SignOut: SignOut,
-    ResetPassword: ResetPassword,
-    ChangeEmail: ChangeEmail
+    signIn: signIn,
+    signUp: signUp,
+    signOut: signOut,
+    resetPassword: resetPassword,
+    changeEmail: changeEmail
 };
