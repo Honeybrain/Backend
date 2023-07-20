@@ -1,31 +1,50 @@
-var messages = require('../proto/js/logs_pb');
+const messages = require('../proto/js/logs_pb');
+const chokidar = require('chokidar');
+const fs = require('fs');
+
+let watchers = new Map();
+
+function processFileChange(path, call) {
+    console.log(`File ${path} has been changed or added`);
+    try {
+        const logContent = fs.readFileSync(path, 'utf8');
+        const reply = new messages.LogReply();
+        reply.setContent(logContent);
+        call.write(reply);
+    } catch (err) {
+        console.error(`Error reading file: ${err}`);
+        const errorReply = new messages.LogReply();
+        errorReply.setContent(`Error reading file: ${err}`);
+        call.write(errorReply);
+        call.end();
+    }
+}
 
 /**
  * Implements the StreamLogs RPC method.
  */
 function streamLogs(call) {
-  console.log("hella");
-  call.on('data', function(feature) {
-    console.log("data");
-  });
-  call.on('end', function() {
-    console.log("end");
-    // The server has finished sending
-  });
-  call.on('error', function(e) {
-    console.log("error");
-    // An error has occurred and the stream has been closed.
-  });
-  call.on('status', function(status) {
-    console.log("status");
-    // process status
-  });
-  const reply = new messages.LogReply();
-  reply.setContent('feur');
-  call.write(reply);
-  call.end();
+    const watcher = chokidar.watch('/honeypot/fast.log', {
+        persistent: true,
+    });
+
+    watchers.set(call, watcher);
+
+    watcher
+        .on('add', path => {
+            processFileChange(path, call);
+        })
+        .on('change', path => {
+            processFileChange(path, call);
+        })
+        .on('error', error => console.log(`Watcher error: ${error}`))
+
+    call.on('end', () => {
+        watcher.close();
+        watchers.delete(call);
+    });
 }
 
 module.exports = {
-  streamLogs: streamLogs
+    streamLogs: streamLogs
 };
