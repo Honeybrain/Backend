@@ -1,12 +1,12 @@
 import express from 'express';
-import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateEmail} from "firebase/auth";
+import { getDatabase, ref, set, child, get } from "firebase/database";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateEmail} from "firebase/auth";
 import firebaseConfig from "../firebaseConfig.json" assert { type: "json" };
 import {initializeApp} from 'firebase/app';
-
+import {saveProjectId, GetProjectId} from '../savepid.js';
 const userRouter = express.Router();
 const firebase = initializeApp(firebaseConfig);
 const auth = getAuth(firebase);
-let user = null;
 
 // Login route
 userRouter.post('/login', (req, res) => {
@@ -14,20 +14,30 @@ userRouter.post('/login', (req, res) => {
     res.send('Please enter your signup credentials.');
   const password = req.body.password;
   const email = req.body.email;
+  const database = getDatabase(firebase);
+  const dbRef = ref(database);
 
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
-      user = userCredential.user;
-      const token = user.stsTokenManager.accessToken;
-      // user signed in successfully
-      res.status(200).json({ message: 'User signed in successfully', token: token });
+      let user = userCredential.user;
+      get(child(dbRef, "users/" + user.uid)).then((snapshot) => {
+        if (snapshot.exists()) {
+          let db_user = snapshot.val();
+          let puid = GetProjectId();
+          if (puid != db_user.project_id) {
+            res.status(400).send('Error signing in user, unknown user');
+          } else
+            res.status(200).json({ message: 'User signed in successfully', token: user.stsTokenManager.accessToken });
+        } else
+          res.status(400).json({ message: 'Error signing in user, unknown user'});
+      })
     })
     .catch((error) => {
       // error signing in user
       console.log(error);
-      res.status(400).send(`Error signing in user: ${error}`);
+      res.status(400).send({ message: `Error signing in user: ${error}`});
     });
-});
+  });
 
 // Change Passsword
 userRouter.post('/resetPassword', (req, res) => {
@@ -60,7 +70,21 @@ userRouter.post('/signup', (req, res) => {
   createUserWithEmailAndPassword(auth, email, password)
   .then((userCredential) => {
     // user created successfully
-    user = userCredential.user;
+    let user = userCredential.user;
+    const database = getDatabase(firebase);
+    let pid = GetProjectId();
+    if (pid == "") {
+      saveProjectId(user.uid);
+      set(ref(database, 'users/' + user.uid), {
+        mail: user.email,
+        project_id: user.uid
+      });
+    } else {
+      set(ref(database, 'users/' + user.uid), {
+        mail: user.email,
+        project_id: pid
+      });
+    }
     res.status(200).json({ message: 'User created successfully', user: user });
   })
   .catch((error) => {
@@ -71,7 +95,6 @@ userRouter.post('/signup', (req, res) => {
 
 // Signout route
 userRouter.post('/signout', (req, res) => {
-  user = null;
   auth.signOut()
   .then(() => {
     // user signed out successfully

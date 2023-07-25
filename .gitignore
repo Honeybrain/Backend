@@ -106,3 +106,6 @@ dist
 
 #apikey
 firebaseConfig.json
+
+# honeypot pid
+puid.json
