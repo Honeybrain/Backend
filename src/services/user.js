@@ -1,7 +1,7 @@
 const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateEmail } = require("firebase/auth");
 const firebaseConfig = require("../firebaseConfig.json");
 const { initializeApp } = require('firebase/app');
-const messages = require('../protos/js/user_pb');
+const messages = require('../protos/user_pb');
 
 const firebase = initializeApp(firebaseConfig);
 const auth = getAuth(firebase);

@@ -1,5 +1,5 @@
 const Docker = require('dockerode');
-const messages = require('../protos/blacklist_pb');
+const messages = require('../../protos/blacklist_pb');
 const docker = new Docker();
 
 /**
