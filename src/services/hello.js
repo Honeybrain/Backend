@@ -1,4 +1,4 @@
-const messages = require('../proto/js/helloworld_pb');
+const messages = require('../protos/helloworld_pb');
 
 /**
  * Implements the StreamLogs RPC method.

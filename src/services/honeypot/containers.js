@@ -1,5 +1,5 @@
 const Docker = require('dockerode');
-const messages = require('../../proto/js/containers_pb');
+const messages = require('../../protos/js/containers_pb');
 const docker = new Docker();
 
 // Handle container event outside the function

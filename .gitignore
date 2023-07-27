@@ -107,7 +107,7 @@ dist
 #apikey
 src/firebaseConfig.json
 yarn.lock
-src/proto/js
+src/protos/
 
 .idea
 .vscode

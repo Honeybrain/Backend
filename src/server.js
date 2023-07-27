@@ -1,8 +1,8 @@
-const logs_services = require('./proto/js/logs_grpc_pb');
-const containers_services = require('./proto/js/containers_grpc_pb');
-const hello_services = require('./proto/js/helloworld_grpc_pb');
-const user_services = require('./proto/js/user_grpc_pb');
-const blacklist_services = require('./proto/js/blacklist_grpc_pb');
+const logs_services = require('./protos/logs_grpc_pb');
+const containers_services = require('./protos/containers_grpc_pb');
+const hello_services = require('./protos/helloworld_grpc_pb');
+const user_services = require('./protos/user_grpc_pb');
+const blacklist_services = require('./protos/blacklist_grpc_pb');
 const { streamLogs } = require('./services/honeypot/logs');
 const { streamContainers } = require('./services/honeypot/containers');
 const { sayHello } = require('./services/hello');
