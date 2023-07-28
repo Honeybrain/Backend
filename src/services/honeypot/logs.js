@@ -24,7 +24,7 @@ function processFileChange(path, call) {
  * Implements the StreamLogs RPC method.
  */
 function streamLogs(call) {
-    const watcher = chokidar.watch('/honeypot/fast.log', {
+    const watcher = chokidar.watch('/app/honeypot/fast.log', {
         persistent: true,
     });
 
