@@ -29,9 +29,6 @@ function main() {
   //GRPC stream log service
   server.addService(logs_services.LogsService, {streamLogs : streamLogs});
   server.addService(containers_services.ContainersService, {streamContainers : streamContainers});
-  server.addService(blacklist_services.BlackListService, {
-    putBlackList: putBlackList,
-  });
 
   //GRPC hello world service
   server.addService(hello_services.GreeterService, {sayHello : sayHello});

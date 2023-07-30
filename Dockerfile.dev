@@ -8,6 +8,6 @@ COPY . .
 
 EXPOSE 50051
 
-RUN yarn
+RUN yarn install --registry=https://registry.yarnpkg.com/
 
 CMD ["yarn", "start"]
