@@ -15,10 +15,12 @@ const GrpcServer = require('./grpcServer');
  * server port
  */
 function main() {
+  console.log("🚀 Starting server");
+
   const server = new GrpcServer();
 
   //GRPC user service
-  server.addService(user_services.UserService, {
+  server.addService("user", user_services.UserService, {
     signIn: signIn,
     signUp: signUp,
     signOut: signOut,
@@ -27,15 +29,15 @@ function main() {
   });
 
   //GRPC stream log service
-  server.addService(logs_services.LogsService, {streamLogs : streamLogs});
-  server.addService(containers_services.ContainersService, {streamContainers : streamContainers});
-  /* server.addService(blacklist_services.BlacklistService, {
+  server.addService("logs", logs_services.LogsService, {streamLogs : streamLogs});
+  server.addService("containers", containers_services.ContainersService, {streamContainers : streamContainers});
+  server.addService("blacklist", blacklist_services.BlacklistService, {
     putBlackList: putBlackList,
     getBlackList: getBlackList,
-  }); */
+  });
 
   //GRPC hello world service
-  server.addService(hello_services.GreeterService, {sayHello : sayHello});
+  server.addService("hello", hello_services.GreeterService, {sayHello : sayHello});
 
   server.start(50051);
 }

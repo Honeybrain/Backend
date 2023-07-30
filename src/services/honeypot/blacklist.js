@@ -1,5 +1,8 @@
-const Docker = require('dockerode');
 const messages = require('../../protos/blacklist_pb');
+const Docker = require('dockerode');
+const chokidar = require('chokidar');
+const fs = require('fs');
+
 const docker = new Docker();
 
 /**
@@ -7,7 +10,7 @@ const docker = new Docker();
  */
 function putBlackList(call, callback) {
     // Extract IP address from request
-    const { ip } = call.request;
+    const ip = call.request.getContent();
 
     if (!ip) {
       const error = new Error('IP address is required');
@@ -53,7 +56,6 @@ function putBlackList(call, callback) {
                     }
 
                     const reply = new messages.PutBlackListReply();
-                    reply.setMessage(`IP ${ip} banned successfully`);
                     callback(null, reply);
                 });
             });
@@ -66,28 +68,25 @@ let watchers = new Map();
 function processFileChange(path, call) {
     console.log(`File ${path} has been changed or added`);
     try {
-        const data = fs.readFileSync(path, 'utf8');
-  
+        const blockContent = fs.readFileSync(path, 'utf8');
+
         // Regular expression to match IP addresses
         const regex = /deny\s+((?:\d{1,3}\.){3}\d{1,3});/g;
-        
         let match;
         let ips = [];
-    
-        while ((match = regex.exec(data)) !== null) {
+
+        while ((match = regex.exec(blockContent)) !== null) {
             // Push the matched IP address to the array
             ips.push(match[1]);
         }
-    
-        ips.forEach(ip => {
-            const reply = new blacklist_proto.GetBlackListReply();
-            reply.setIps(ip);
-            call.write(reply);
-        });
+
+        const reply = new messages.GetBlackListReply();
+        reply.setContent(blockContent);
+        call.write(reply);
     } catch (err) {
         console.error(`Error reading file: ${err}`);
-        const errorReply = new blacklist_proto.GetBlackListReply();
-        errorReply.setIps(`Error reading file: ${err}`);
+        const errorReply = new messages.GetBlackListReply();
+        errorReply.setContent(`Error reading file: ${err}`);
         call.write(errorReply);
         call.end();
     }
@@ -97,9 +96,11 @@ function processFileChange(path, call) {
  * Implements the getBlackList RPC method.
  */
 function getBlackList(call) {
-    const watcher = chokidar.watch('/honeypot/block.conf', {
+    const watcher = chokidar.watch('/app/honeypot/block.conf', {
         persistent: true,
     });
+
+    watchers.set(call, watcher);
   
     watcher
         .on('add', path => {
@@ -112,6 +113,7 @@ function getBlackList(call) {
   
     call.on('end', () => {
         watcher.close();
+        watchers.delete(call);
     });
 }
 
