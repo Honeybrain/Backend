@@ -81,13 +81,10 @@ function processFileChange(path, call) {
         }
 
         const reply = new messages.GetBlackListReply();
-        reply.setContent(blockContent);
+        reply.setIpList(ips);
         call.write(reply);
     } catch (err) {
         console.error(`Error reading file: ${err}`);
-        const errorReply = new messages.GetBlackListReply();
-        errorReply.setContent(`Error reading file: ${err}`);
-        call.write(errorReply);
         call.end();
     }
   }
