@@ -4,7 +4,7 @@ const docker = new Docker();
 
 // Handle container event outside the function
 function handleContainerEvent(call) {
-    docker.getNetwork('honeypot_network').inspect({}, (err, networkData) => {
+    docker.getNetwork('honeypot_network').inspect({ all: true }, (err, networkData) => {
         if (err) {
             console.error(`exec error: ${err}`);
             return;
@@ -13,7 +13,7 @@ function handleContainerEvent(call) {
         const networkContainers = networkData.Containers;
         const containerIds = Object.keys(networkContainers);
 
-        docker.listContainers({}, (err, containers) => {
+        docker.listContainers({ all: true }, (err, containers) => {
             if (err) {
                 console.error(`exec error: ${err}`);
                 return;
