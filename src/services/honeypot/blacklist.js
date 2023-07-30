@@ -94,7 +94,7 @@ function processFileChange(path, call) {
   }
 
 /**
- * Implements the StreamLogs RPC method.
+ * Implements the getBlackList RPC method.
  */
 function getBlackList(call) {
     const watcher = chokidar.watch('/honeypot/block.conf', {

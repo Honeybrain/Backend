@@ -7,7 +7,7 @@ const { streamLogs } = require('./services/honeypot/logs');
 const { streamContainers } = require('./services/honeypot/containers');
 const { sayHello } = require('./services/hello');
 const { signIn, signUp, signOut, resetPassword, changeEmail } = require('./services/user');
-const { putBlackList } = require('./services/honeypot/blacklist');
+const { putBlackList, getBlackList } = require('./services/honeypot/blacklist');
 const GrpcServer = require('./grpcServer');
 
 /**
@@ -29,6 +29,10 @@ function main() {
   //GRPC stream log service
   server.addService(logs_services.LogsService, {streamLogs : streamLogs});
   server.addService(containers_services.ContainersService, {streamContainers : streamContainers});
+  /* server.addService(blacklist_services.BlacklistService, {
+    putBlackList: putBlackList,
+    getBlackList: getBlackList,
+  }); */
 
   //GRPC hello world service
   server.addService(hello_services.GreeterService, {sayHello : sayHello});
