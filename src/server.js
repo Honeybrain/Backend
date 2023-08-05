@@ -5,9 +5,9 @@ const user_services = require('./protos/user_grpc_pb');
 const blacklist_services = require('./protos/blacklist_grpc_pb');
 const { streamLogs } = require('./services/honeypot/logs');
 const { streamContainers } = require('./services/honeypot/containers');
+const { putBlackList, getBlackList, putWhiteList } = require('./services/honeypot/blacklist');
 const { sayHello } = require('./services/hello');
 const { signIn, signUp, signOut, resetPassword, changeEmail } = require('./services/user');
-const { putBlackList, getBlackList } = require('./services/honeypot/blacklist');
 const GrpcServer = require('./grpcServer');
 
 /**
@@ -34,6 +34,7 @@ function main() {
   server.addService("blacklist", blacklist_services.BlacklistService, {
     putBlackList: putBlackList,
     getBlackList: getBlackList,
+    putWhiteList: putWhiteList,
   });
 
   //GRPC hello world service
