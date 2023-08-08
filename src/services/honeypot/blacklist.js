@@ -2,8 +2,8 @@ const messages = require('../../protos/blacklist_pb');
 const Docker = require('dockerode');
 const chokidar = require('chokidar');
 const fs = require('fs');
-const path = require('path');
 const grpc = require('@grpc/grpc-js');
+const dashboardEvents = require('./dashboardEvents');
 
 const docker = new Docker();
 
@@ -149,7 +149,7 @@ function putBlackList(call, callback) {
 
 let watchers = new Map();
 
-function processFileChange(path, call) {
+function processFileChange(path, call, emitEvent = false) {
     console.log(`File ${path} has been changed or added`);
     try {
         const blockContent = fs.readFileSync(path, 'utf8');
@@ -164,9 +164,13 @@ function processFileChange(path, call) {
             ips.push(match[1]);
         }
 
-        const reply = new messages.GetBlackListReply();
-        reply.setIpsList(ips);
-        call.write(reply);
+        if (emitEvent) {
+            dashboardEvents.emit('data', 'blacklist', ips);
+        } else {
+            const reply = new messages.GetBlackListReply();
+            reply.setIpsList(ips);
+            call.write(reply);
+        }
     } catch (err) {
         console.error(`Error reading file: ${err}`);
         call.end();
@@ -176,7 +180,7 @@ function processFileChange(path, call) {
 /**
  * Implements the getBlackList RPC method.
  */
-function getBlackList(call) {
+function getBlackList(call, emitEvent = false) {
     const watcher = chokidar.watch('/app/honeypot/block.conf', {
         persistent: true,
     });
@@ -185,10 +189,10 @@ function getBlackList(call) {
   
     watcher
         .on('add', path => {
-            processFileChange(path, call);
+            processFileChange(path, call, emitEvent);
         })
         .on('change', path => {
-            processFileChange(path, call);
+            processFileChange(path, call, emitEvent);
         })
         .on('error', error => console.log(`Watcher error: ${error}`));
   

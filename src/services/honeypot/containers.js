@@ -1,9 +1,9 @@
 const Docker = require('dockerode');
 const messages = require('../../protos/containers_pb');
+const dashboardEvents = require('./dashboardEvents');
 const docker = new Docker();
 
-// Handle container event outside the function
-function handleContainerEvent(call) {
+function handleContainerEvent(call, emitEvent = false) {
     docker.getNetwork('honeypot_network').inspect({ all: true }, (err, networkData) => {
         if (err) {
             console.error(`exec error: ${err}`);
@@ -34,13 +34,18 @@ function handleContainerEvent(call) {
 
             const reply = new messages.ContainersReply();
             reply.setContainersList(containersData);
-            call.write(reply);
+            
+            if (emitEvent) {
+                dashboardEvents.emit('data', 'containers', containersData);
+            } else {
+                call.write(reply);
+            }
         });
     });
 }
 
-function streamContainers(call) {
-    handleContainerEvent(call); // Send initial state of containers
+function streamContainers(call, emitEvent = false) {
+    handleContainerEvent(call, emitEvent); // Send initial state of containers
 
     docker.getEvents({}, (err, data) => {
         if (err) {
@@ -52,7 +57,7 @@ function streamContainers(call) {
             const event = JSON.parse(chunk.toString('utf8'));
 
             if (event.Type === 'container') {
-                handleContainerEvent(call);
+                handleContainerEvent(call, emitEvent);
             }
         });
 
@@ -63,5 +68,5 @@ function streamContainers(call) {
 }
 
 module.exports = {
-    streamContainers: streamContainers
+    streamContainers: streamContainers,
 };

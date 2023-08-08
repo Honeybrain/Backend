@@ -3,9 +3,11 @@ const containers_services = require('./protos/containers_grpc_pb');
 const hello_services = require('./protos/helloworld_grpc_pb');
 const user_services = require('./protos/user_grpc_pb');
 const blacklist_services = require('./protos/blacklist_grpc_pb');
+const dashboard_services = require('./protos/dashboard_grpc_pb');
 const { streamLogs } = require('./services/honeypot/logs');
 const { streamContainers } = require('./services/honeypot/containers');
 const { putBlackList, getBlackList, putWhiteList } = require('./services/honeypot/blacklist');
+const { streamDashboardInformation } = require('./services/honeypot/dashboard');
 const { sayHello } = require('./services/hello');
 const { signIn, signUp, signOut, resetPassword, changeEmail } = require('./services/user');
 const GrpcServer = require('./grpcServer');
@@ -35,6 +37,9 @@ function main() {
     putBlackList: putBlackList,
     getBlackList: getBlackList,
     putWhiteList: putWhiteList,
+  });
+  server.addService("dashboard", dashboard_services.DashboardService, {
+    streamDashboardInformation: streamDashboardInformation,
   });
 
   //GRPC hello world service
