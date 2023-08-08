@@ -15,9 +15,6 @@ function gatherAndSendData(call) {
         reply.setIpsList(dashboardData.blacklist);
         reply.setLogs(dashboardData.logs);
         call.write(reply);
-
-        // Réinitialisez pour la prochaine série de données
-        dashboardData = {};
     };
 }
 
