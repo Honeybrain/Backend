@@ -1,25 +1,35 @@
 const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateEmail } = require("firebase/auth");
 const firebaseConfig = require("../firebaseConfig.json");
+const { getDatabase, ref, set, child, get } = require("firebase/database");
 const { initializeApp } = require('firebase/app');
 const messages = require('../protos/user_pb');
+const { saveProjectId, GetProjectId } = require('../utils/savepid');
 
 const firebase = initializeApp(firebaseConfig);
 const auth = getAuth(firebase);
-let user = null;
 
 function signIn(call, callback) {
     const email = call.request.getEmail();
     const password = call.request.getPassword();
 
+    const database = getDatabase(firebase);
+    const dbRef = ref(database);
+
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            user = userCredential.user;
-            const token = user.stsTokenManager.accessToken;
-
-            const reply = new messages.UserResponse();
-            reply.setMessage('User signed in successfully');
-            reply.setToken(token);
-            callback(null, reply);
+            let user = userCredential.user;
+            get(child(dbRef, "users/" + user.uid)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    let db_user = snapshot.val();
+                    let puid = GetProjectId();
+                    if (puid === db_user.project_id) {
+                        const reply = new messages.UserResponse();
+                        reply.setMessage('User signed in successfully');
+                        reply.setToken(user.stsTokenManager.accessToken);
+                        callback(null, reply);
+                    }
+                }
+            })
         })
         .catch((error) => {
             callback(error);
@@ -32,8 +42,23 @@ function signUp(call, callback) {
 
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            user = userCredential.user;
+            let user = userCredential.user;
+            const database = getDatabase(firebase);
+            let pid = GetProjectId();
 
+            if (pid == "") {
+                saveProjectId(user.uid);
+                set(ref(database, 'users/' + user.uid), {
+                    mail: user.email,
+                    project_id: user.uid
+                });
+            } else {
+                set(ref(database, 'users/' + user.uid), {
+                    mail: user.email,
+                    project_id: pid
+                });
+            }
+            
             const reply = new messages.UserResponse();
             reply.setMessage('User created successfully');
             reply.setToken(user.stsTokenManager.accessToken);
@@ -45,7 +70,6 @@ function signUp(call, callback) {
 }
 
 function signOut(call, callback) {
-    user = null;
     auth.signOut()
         .then(() => {
             const reply = new messages.EmptyResponse();
