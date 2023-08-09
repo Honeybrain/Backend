@@ -105,4 +105,9 @@ dist
 .tern-port
 
 #apikey
-firebaseConfig.json
+src/firebaseConfig.json
+yarn.lock
+src/protos/
+
+.idea
+.vscode
