@@ -106,6 +106,7 @@ dist
 
 #apikey
 src/firebaseConfig.json
+firebaseConfig.json
 
 yarn.lock
 src/protos/
