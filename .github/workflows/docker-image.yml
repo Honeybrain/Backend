@@ -12,8 +12,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        path: Backend
     - name: Create config file
       env:
         FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
@@ -27,6 +25,7 @@ jobs:
     - name: Build protos
       run: |
         cd ../Honeypot
+        chmod 777 ./scripts/make_backend_protos.sh
         ./scripts/make_backend_protos.sh ./protos ../Backend
     - name: Build the Docker
       env:
