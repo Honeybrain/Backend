@@ -2,7 +2,7 @@ name: Docker Build
 
 on:
   push:
-    branches: [ S2-3.1/grpc_docker ]
+    branches: [ main ]
 
 jobs:
 
