@@ -2,7 +2,7 @@ name: Docker Build
 
 on:
   push:
-    branches: [ main ]
+    branches: [ S2-3.1/grpc_docker ]
 
 jobs:
 
@@ -17,6 +17,15 @@ jobs:
         FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
       run: |
         echo $FIREBASE_CONFIG > ./firebaseConfig.json
+    - name: Clone honeypot
+      run: |
+        cd ..
+        git clone https://github.com/Honeybrain/Honeypot
+        cd Honeypot
+    - name: Build protos
+      run: |
+        cd ../Honeypot
+        ./scripts/make_backend_protos.sh ./protos ../Backend
     - name: Build the Docker
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
