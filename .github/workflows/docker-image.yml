@@ -12,6 +12,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        path: Backend
     - name: Create config file
       env:
         FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
