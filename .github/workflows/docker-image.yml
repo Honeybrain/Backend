@@ -27,15 +27,21 @@ jobs:
         cd ../Honeypot
         chmod 777 ./scripts/make_backend_protos.sh
         ./scripts/make_backend_protos.sh ./protos ../Backend
-    - name: Build the Docker
+    - name: Build Backend Docker
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
       run: |
         docker build -t $DOCKER_USER/hb_dashboard_back .
-    - name: Push the Docker
+    - name: Build Envoy Docker
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      run: |
+        docker build -t $DOCKER_USER/hb_dashboard_envoy -f Dockerfile.envoy .
+    - name: Push the Dockers
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
         docker push $DOCKER_USER/hb_dashboard_back
+        docker push $DOCKER_USER/hb_dashboard_envoy
