@@ -16,7 +16,7 @@ jobs:
       env:
         FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
       run: |
-        echo $FIREBASE_CONFIG > ./firebaseConfig.json
+        echo $FIREBASE_CONFIG > ./src/firebaseConfig.json
     - name: Clone honeypot
       run: |
         cd ..
