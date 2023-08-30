@@ -9,8 +9,8 @@ import { EnvironmentVariables } from './_utils/config/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   app.connectMicroservice<MicroserviceOptions>(grpcClientOptions);
+
   app
     .setGlobalPrefix('api')
     .useGlobalPipes(
@@ -35,6 +35,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService<EnvironmentVariables, true>);
 
   await app.listen(configService.get('PORT'));
+  await app.startAllMicroservices();
   console.log('Launch on port ', await app.getUrl());
 }
 void bootstrap();

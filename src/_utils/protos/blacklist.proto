@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package blacklist;
+
+service Blacklist {
+  rpc PutBlackList (PutBlackListRequest) returns (PutBlackListReply) {}
+  rpc GetBlackList (GetBlackListRequest) returns (stream GetBlackListReply) {}
+  rpc PutWhiteList (PutWhiteListRequest) returns (PutWhiteListReply) {}
+}
+
+message PutBlackListRequest {
+    string ip = 1;
+}
+
+message PutBlackListReply {
+}
+
+message GetBlackListRequest {}
+
+message GetBlackListReply {
+  repeated string ips = 1;
+}
+
+message PutWhiteListRequest {
+  string ip = 1;
+}
+
+message PutWhiteListReply {
+}
