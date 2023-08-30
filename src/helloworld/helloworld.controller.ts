@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, OnModuleInit, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Query } from '@nestjs/common';
 import { HelloworldService } from './helloworld.service';
 import { ApiTags } from '@nestjs/swagger';
 import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
@@ -8,17 +8,13 @@ import { HelloRequestDto } from './_utils/dto/request/hello-request.dto';
 
 @Controller('helloworld')
 @ApiTags('Hello world')
-export class HelloworldController implements OnModuleInit {
+export class HelloworldController {
   constructor(
     @Inject('HELLOWORLD_PACKAGE') private readonly client: ClientGrpc,
     private readonly helloworldService: HelloworldService,
   ) {}
 
-  private greeterProtoService: GreeterProtoService;
-
-  onModuleInit() {
-    this.greeterProtoService = this.client.getService('Greeter');
-  }
+  private greeterProtoService: GreeterProtoService = this.client.getService('Greeter');
 
   @Get('say-hello')
   sayHello(@Query() query: HelloRequestDto): HelloReplyDto {
