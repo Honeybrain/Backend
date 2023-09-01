@@ -2,6 +2,8 @@
 *.log
 *.pid
 *.swp
+*lock.json
+*lock
 .DS_Store
 .vscode
 
