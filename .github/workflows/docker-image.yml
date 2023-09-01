@@ -2,8 +2,7 @@ name: Docker Backend
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 env:
   DOCKER_USER: ${{ secrets.DOCKER_USER }}
@@ -20,12 +19,27 @@ jobs:
       run: |
         mkdir $DOCKER_CONFIG
         echo -n "$DOCKER_PASSWORD" | docker --config $DOCKER_CONFIG login --username $DOCKER_USER --password-stdin
-    - name: Create firebase config file
+    - name: Create config file
       run: |
-        echo $FIREBASE_CONFIG > ./firebaseConfig.json
+        echo $FIREBASE_CONFIG > ./src/firebaseConfig.json
+    - name: Clone honeypot
+      run: |
+        cd ..
+        git clone https://github.com/Honeybrain/Honeypot
+        cd Honeypot
+    - name: Build protos
+      run: |
+        cd ../Honeypot
+        chmod 777 ./scripts/make_backend_protos.sh
+        ./scripts/make_backend_protos.sh ./protos ../Backend
     - name: Build the Backend image
       run: |
         docker build -t $DOCKER_USER/hb_dashboard_back .
-    - name: Push the Backend image
+    - name: Build Envoy image
       run: |
-        docker --config $DOCKER_CONFIG push $DOCKER_USER/hb_dashboard_back
+        docker build -t $DOCKER_USER/hb_dashboard_envoy -f Dockerfile.envoy .
+    - name: Push the images
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+        docker push $DOCKER_USER/hb_dashboard_back
+        docker push $DOCKER_USER/hb_dashboard_envoy
