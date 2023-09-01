@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { HelloworldService } from './helloworld.service';
 import { HelloworldController } from './helloworld.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -9,7 +10,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       {
         name: 'HELLOWORLD_PACKAGE',
         transport: Transport.GRPC,
-        options: { package: 'helloworld', protoPath: 'src/helloworld/_utils/helloworld.proto' },
+        options: { package: 'helloworld', protoPath: join(__dirname, './_utils/helloworld.proto') },
       },
     ]),
   ],
