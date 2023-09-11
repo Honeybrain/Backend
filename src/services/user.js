@@ -1,35 +1,25 @@
 const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateEmail } = require("firebase/auth");
 const firebaseConfig = require("../firebaseConfig.json");
-const { getDatabase, ref, set, child, get } = require("firebase/database");
 const { initializeApp } = require('firebase/app');
 const messages = require('../protos/user_pb');
-const { saveProjectId, GetProjectId } = require('../utils/savepid');
 
 const firebase = initializeApp(firebaseConfig);
 const auth = getAuth(firebase);
+let user = null;
 
 function signIn(call, callback) {
     const email = call.request.getEmail();
     const password = call.request.getPassword();
 
-    const database = getDatabase(firebase);
-    const dbRef = ref(database);
-
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            let user = userCredential.user;
-            get(child(dbRef, "users/" + user.uid)).then((snapshot) => {
-                if (snapshot.exists()) {
-                    let db_user = snapshot.val();
-                    let puid = GetProjectId();
-                    if (puid === db_user.project_id) {
-                        const reply = new messages.UserResponse();
-                        reply.setMessage('User signed in successfully');
-                        reply.setToken(user.stsTokenManager.accessToken);
-                        callback(null, reply);
-                    }
-                }
-            })
+            user = userCredential.user;
+            const token = user.stsTokenManager.accessToken;
+
+            const reply = new messages.UserResponse();
+            reply.setMessage('User signed in successfully');
+            reply.setToken(token);
+            callback(null, reply);
         })
         .catch((error) => {
             callback(error);
@@ -42,23 +32,8 @@ function signUp(call, callback) {
 
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            let user = userCredential.user;
-            const database = getDatabase(firebase);
-            let pid = GetProjectId();
+            user = userCredential.user;
 
-            if (pid == "") {
-                saveProjectId(user.uid);
-                set(ref(database, 'users/' + user.uid), {
-                    mail: user.email,
-                    project_id: user.uid
-                });
-            } else {
-                set(ref(database, 'users/' + user.uid), {
-                    mail: user.email,
-                    project_id: pid
-                });
-            }
-            
             const reply = new messages.UserResponse();
             reply.setMessage('User created successfully');
             reply.setToken(user.stsTokenManager.accessToken);
@@ -70,6 +45,7 @@ function signUp(call, callback) {
 }
 
 function signOut(call, callback) {
+    user = null;
     auth.signOut()
         .then(() => {
             const reply = new messages.EmptyResponse();
@@ -109,10 +85,131 @@ function changeEmail(call, callback) {
         });
 }
 
+async function userRights(call, callback) {
+    let rights = null;
+  
+    try {
+      const snapshot = await get(child(dbRef, "users/" + user.uid));
+  
+      if (snapshot.exists()) {
+        let db_user = snapshot.val();
+        rights = db_user.rights;
+        //res.json({ rights });
+        const reply = new messages.UserResponse();
+        reply.userRights({ rights })
+        reply.setMessage('Rights get successfully');
+        callback(null, reply);
+      } else {
+        res.status(400).json({ message: 'Error, unknown user' });
+      }
+    } catch (error) {
+        callback(error);
+    }
+  }
+
+async function changeUserRights(call, callback) {
+    try {
+      const dbRef = ref(getDatabase());
+      const uid = call.request.getUid()
+      const snapshot = await get(child(dbRef, "users/" + uid));
+  
+      if (snapshot.exists()) {
+        const newRights = req.body.newRights;
+        await update(child(dbRef, "users/" + uid), { rights: newRights });
+        const reply = new messages.UserResponse();
+        reply.setMessage('Rights changed successfully');
+        callback(null, reply);
+      }
+    } catch (error) {
+        callback(error);
+    }
+  }
+
+async function deleteUser(call, callback) {
+const uid = call.request.getUid();
+try {
+    const snapshot = await get(child(dbRef, "users/" + uid));
+
+    if (snapshot.exists()) {
+    await remove(child(dbRef, "users/" + uid));
+    const reply = new messages.UserResponse();
+    reply.setMessage('User deleted successfully');
+    callback(null, reply);
+    }
+} catch (error) {
+    callback(error)
+}
+}
+
+async function usersByProjectId(call, callback) {
+let project_id = await GetProjectId();
+const filteredUsers = [];
+try {
+    const usersSnapshot = await get(child(dbRef, "users/"));
+    if (usersSnapshot.exists()) {
+    const users = usersSnapshot.val();
+    
+    for (const key in users) {
+        if (users[key].project_id == project_id) {
+            filteredUsers.push({ [key]: users[key] });
+        }
+    }
+    const reply = new messages.UserResponse();
+    reply.setUsers(filteredUsers);
+    reply.setMessage('User deleted successfully');
+    callback(null, reply);
+    }
+} catch (error) {
+    callback(error)
+}
+}
+
+async function inviteUser(call, callback) {
+const destinataire = call.request.getEmail();
+const sujet = 'Création de compte honeybrain';
+const id = crypto.randomBytes(32).toString('hex');
+const token = crypto.randomBytes(32).toString('hex');
+const message = 'Bonjour,\nAfin de créer votre compte honeybrain veuillez ouvrir le lien suivant: ' + token;
+const expiryDate = new Date();
+expiryDate.setHours(expiryDate.getHours() + 24);
+
+set(ref(database, 'invits/' + id), {
+    email: destinataire,
+    expiryDate: expiryDate,
+    isUsed: false,
+    token: token
+});
+
+
+const mailOptions = {
+    from: `Honeybrain <${gmailConfig.user}>`,
+    to: destinataire,
+    subject: sujet,
+    text: message
+};
+
+try {
+    await transporter.sendMail(mailOptions);
+    const reply = new messages.UserResponse();
+    reply.setToken(token);
+    reply.setMessage('Mail sent succesfully');
+    callback(null, reply);
+    //res.json({token: token});
+} catch (error) {
+    callback(error)
+}
+}
+
+
 module.exports = {
     signIn: signIn,
     signUp: signUp,
     signOut: signOut,
     resetPassword: resetPassword,
-    changeEmail: changeEmail
+    changeEmail: changeEmail,
+    userRights: userRights,
+    changeUserRights: changeUserRights,
+    deleteUser: deleteUser,
+    usersByProjectId: usersByProjectId,
+    inviteUser: inviteUser,
 };
