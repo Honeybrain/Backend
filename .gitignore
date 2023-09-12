@@ -117,3 +117,7 @@ src/protos/
 
 # honeypot pid
 puid.json
+
+serviceAccountKey.json
+
+.DS_Store

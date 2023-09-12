@@ -2,6 +2,7 @@ const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sen
 const firebaseConfig = require("../firebaseConfig.json");
 const { initializeApp } = require('firebase/app');
 const messages = require('../protos/user_pb');
+const crypto = require('crypto');
 
 const firebase = initializeApp(firebaseConfig);
 const auth = getAuth(firebase);
