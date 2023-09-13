@@ -10,7 +10,11 @@ import { join } from 'path';
       {
         name: 'BLACKLIST_PACKAGE',
         transport: Transport.GRPC,
-        options: { package: 'blacklist', protoPath: join(__dirname, './_utils/blacklist.proto') },
+        options: {
+          url: process.env.GRPC_URL,
+          package: 'blacklist',
+          protoPath: join(__dirname, './_utils/blacklist.proto'),
+        },
       },
     ]),
   ],

@@ -4,6 +4,7 @@ import { join } from 'path';
 export const grpcClientOptions: ClientOptions = {
   transport: Transport.GRPC,
   options: {
+    url: process.env.GRPC_URL,
     package: ['logs', 'helloworld', 'dashboard', 'containers', 'blacklist', 'user'], // proto package name
     protoPath: [
       './logs/_utils/logs.proto',

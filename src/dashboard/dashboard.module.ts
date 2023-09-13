@@ -11,6 +11,7 @@ import { join } from 'path';
         name: 'DASHBOARD_PACKAGE',
         transport: Transport.GRPC,
         options: {
+          url: process.env.GRPC_URL,
           package: ['dashboard', 'logs', 'containers', 'blacklist'],
           protoPath: [
             join(__dirname, './_utils/dashboard.proto'),

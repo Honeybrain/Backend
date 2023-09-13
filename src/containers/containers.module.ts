@@ -10,7 +10,11 @@ import { join } from 'path';
       {
         name: 'CONTAINERS_PACKAGE',
         transport: Transport.GRPC,
-        options: { package: 'containers', protoPath: join(__dirname, './_utils/containers.proto') },
+        options: {
+          url: process.env.GRPC_URL,
+          package: 'containers',
+          protoPath: join(__dirname, './_utils/containers.proto'),
+        },
       },
     ]),
   ],

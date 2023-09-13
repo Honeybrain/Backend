@@ -10,7 +10,11 @@ import { join } from 'path';
       {
         name: 'HELLOWORLD_PACKAGE',
         transport: Transport.GRPC,
-        options: { package: 'helloworld', protoPath: join(__dirname, './_utils/helloworld.proto') },
+        options: {
+          url: process.env.GRPC_URL,
+          package: 'helloworld',
+          protoPath: join(__dirname, './_utils/helloworld.proto'),
+        },
       },
     ]),
   ],

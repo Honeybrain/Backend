@@ -10,7 +10,11 @@ import { join } from 'path';
       {
         name: 'LOGS_PACKAGE',
         transport: Transport.GRPC,
-        options: { package: 'logs', protoPath: join(__dirname, './_utils/logs.proto') },
+        options: {
+          url: process.env.GRPC_URL,
+          package: 'logs',
+          protoPath: join(__dirname, './_utils/logs.proto'),
+        },
       },
     ]),
   ],
