@@ -5,10 +5,10 @@ import { exit } from 'process';
 
 export class EnvironmentVariables {
   @IsNumber()
-  PORT: number = 3000;
+  PORT: number = 3001;
 
   @IsString()
-  MONGODB_URL: string = 'mongodb://127.0.0.1:27017/honeybrain';
+  MONGODB_URL: string = 'mongodb://mongo:27017/honeybrain';
 
   @IsString()
   JWT_SECRET: string = 'H0N3YBRA1N!*';
