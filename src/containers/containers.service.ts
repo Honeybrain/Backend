@@ -31,22 +31,23 @@ export class ContainersService {
     subject.next({ containers: containersData });
   }
 
-  async streamContainers() {
+  streamContainers() {
     const subject = new Subject<ContainersReplyDto>();
 
     const sendContainerEvent = () =>
       this.handleContainerEvent(subject).catch((err) => subject.error(`Handle docker container event error: ${err}`));
 
-    await sendContainerEvent(); // Send initial state of containers
+    void sendContainerEvent(); // Send initial state of containers
 
     this.docker
       .getEvents({})
       .then((data) => {
         data.on('data', (chunk) => {
           const event = JSON.parse(chunk.toString());
-          if (event.Type === 'container') sendContainerEvent();
+          if (event.Type === 'container') {
+            sendContainerEvent();
+          }
         });
-
         data.on('end', () => subject.unsubscribe());
       })
       .catch((err) => subject.error(`Docker get events error: ${err}`));

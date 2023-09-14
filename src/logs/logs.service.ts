@@ -11,8 +11,6 @@ export class LogsService {
   private logger = new Logger(LogsService.name);
 
   private processFileChange(path: string, subject: Subject<LogReplyDto>) {
-    this.logger.debug(`File ${path} has been changed or added`);
-
     readFile(path, 'utf8')
       .then((logContent) => subject.next({ content: logContent }))
       .catch((err) => {

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { watch } from 'chokidar';
 import { ServerUnaryCall } from '@grpc/grpc-js';
 import { GetIdsDto } from './_utils/dto/response/get-ids.dto';
@@ -10,13 +10,9 @@ import { readFile, writeFile } from 'fs/promises';
 
 @Injectable()
 export class BlacklistService {
-  private logger = new Logger(BlacklistService.name);
-
   private docker = new Docker();
 
   private async processFileChange(path: string, subject: Subject<GetIdsDto>) {
-    this.logger.debug(`File ${path} has been changed or added`);
-
     readFile(path, 'utf8')
       .then((blockContent) => {
         const regex = /deny\s+((?:\d{1,3}\.){3}\d{1,3});/g;
