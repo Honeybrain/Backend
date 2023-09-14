@@ -11,7 +11,7 @@ export class EnvironmentVariables {
   MONGODB_URL: string = 'mongodb://mongo:27017/honeybrain';
 
   @IsString()
-  GRPC_URL: string = 'localhost:50051';
+  GRPC_URL: string = 'backend:50051';
 
   @IsString()
   JWT_SECRET: string = 'H0N3YBRA1N!*';
