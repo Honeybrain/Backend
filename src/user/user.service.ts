@@ -1,9 +1,9 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { SignInSignUpDto } from './_utils/dto/request/sign-in-sign-up.dto';
+import { UserResponseDto } from './_utils/dto/response/user-response.dto';
 import { UserRepository } from './user.repository';
 import { RpcException } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
-import { UserResponseDto } from './_utils/dto/response/user-response.dto';
 import { compareSync } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from '../_utils/config/config';
@@ -34,7 +34,21 @@ export class UserService implements OnModuleInit {
 
   async signIn(signInSignUpDto: SignInSignUpDto): Promise<UserResponseDto> {
     const user = await this.usersRepository.findByEmail(signInSignUpDto.email);
-    if (compareSync(user.password, signInSignUpDto.password)) throw new RpcException('WRONG_PASSWORD');
+    if (!compareSync(signInSignUpDto.password, user.password)) throw new RpcException('WRONG_PASSWORD');
     return { message: 'User signed in successfully', token: this.jwtService.sign({ id: user._id }) };
+  }
+
+  async changeEmail(token: string, newEmail: string): Promise<UserResponseDto> {
+    const decodedToken = this.jwtService.decode(token) as any;
+    const userId = decodedToken.id;
+    await this.usersRepository.changeEmail(userId, newEmail);
+    return { message: 'E-mail modifié avec succès', token: token };
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<UserResponseDto> {
+    const decodedToken = this.jwtService.decode(token) as any;
+    const userId = decodedToken.id;
+    await this.usersRepository.resetPassword(userId, newPassword);
+    return { message: 'Mot de passe réinitialisé avec succès', token: token };
   }
 }

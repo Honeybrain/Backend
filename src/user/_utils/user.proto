@@ -19,15 +19,20 @@ message EmptyResponse {
   string message = 1;
 }
 
-// The EmailRequest message is used for the operations that require only the email.
+message PasswordRequest {
+  string token = 1;
+  string password = 2;
+}
+
 message EmailRequest {
-  string email = 1;
+  string token = 1;
+  string email = 2;
 }
 
 // The UserService defines the methods that our service exposes
 service User {
   rpc SignIn(SignInSignUpRequest) returns (UserResponse);
   rpc SignUp(SignInSignUpRequest) returns (UserResponse);
-  rpc ResetPassword(EmailRequest) returns (UserResponse);
+  rpc ResetPassword(PasswordRequest) returns (UserResponse);
   rpc ChangeEmail(EmailRequest) returns (UserResponse);
 }
