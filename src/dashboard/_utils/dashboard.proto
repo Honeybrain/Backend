@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package dashboard;
+
+service Dashboard {
+  rpc StreamDashboardInformation (DashboardRequest) returns (stream DashboardReply) {}
+}
+
+message DashboardRequest {}
+
+message Container {
+  string name = 1;
+  string status = 2;
+  string ip = 3;
+}
+
+message DashboardReply {
+  repeated string ips = 1;
+  repeated Container containers = 2;
+  string logs = 3;
+}

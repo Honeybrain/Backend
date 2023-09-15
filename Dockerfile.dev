@@ -6,8 +6,11 @@ WORKDIR /app
 
 COPY ./package.json ./
 COPY ./yarn.lock ./
+
+RUN yarn install
+
 COPY . .
 
 EXPOSE 50051
 
-CMD ["yarn", "start"]
+CMD ["yarn", "start:dev"]

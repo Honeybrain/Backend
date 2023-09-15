@@ -1,13 +1,27 @@
-FROM node:18.16.0
-
-RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
+# Étape de build
+FROM node:18.16.0 AS builder
 
 WORKDIR /app
 
-COPY . .
+COPY ./package.json ./
+COPY ./yarn.lock ./
 
 RUN yarn install
 
-EXPOSE 50051
+COPY . .
 
-CMD ["yarn", "start"]
+RUN yarn build
+
+FROM node:18.16.0-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/dist ./dist
+COPY ./package.json ./
+COPY ./yarn.lock ./
+
+RUN yarn install --production
+
+EXPOSE 3000
+
+CMD ["node", "dist/main"]
