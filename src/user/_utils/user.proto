@@ -28,7 +28,6 @@ message EmailRequest {
 service User {
   rpc SignIn(SignInSignUpRequest) returns (UserResponse);
   rpc SignUp(SignInSignUpRequest) returns (UserResponse);
-  rpc SignOut(EmptyRequest) returns (EmptyResponse);
   rpc ResetPassword(EmailRequest) returns (UserResponse);
   rpc ChangeEmail(EmailRequest) returns (UserResponse);
 }
