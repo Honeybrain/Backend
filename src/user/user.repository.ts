@@ -29,4 +29,16 @@ export class UserRepository {
       email: signInSignUpDto.email,
       password: hashSync(signInSignUpDto.password, 10),
     });
+
+  async changeEmail(userId: string, newEmail: string): Promise<UserDocument> {
+    const user = await this.findById(userId);
+    user.email = newEmail;
+    return user.save();
+  }
+
+  async resetPassword(userId: string, newPassword: string): Promise<UserDocument> {
+    const user = await this.findById(userId);
+    user.password = hashSync(newPassword, 10);
+    return user.save();
+  }
 }
