@@ -9,7 +9,17 @@ const { streamContainers } = require('./services/honeypot/containers');
 const { putBlackList, getBlackList, putWhiteList } = require('./services/honeypot/blacklist');
 const { streamDashboardInformation } = require('./services/honeypot/dashboard');
 const { sayHello } = require('./services/hello');
-const { signIn, signUp, signOut, resetPassword, changeEmail } = require('./services/user');
+const { signIn,
+  signUp,
+  signOut, 
+  resetPassword, 
+  changeEmail, 
+  userRights, 
+  changeUserRights, 
+  deleteUser, 
+  usersByProjectId, 
+  inviteUser, 
+  validateInvitation } = require('./services/user');
 const GrpcServer = require('./grpcServer');
 
 /**
@@ -27,7 +37,13 @@ function main() {
     signUp: signUp,
     signOut: signOut,
     resetPassword: resetPassword,
-    changeEmail: changeEmail
+    changeEmail: changeEmail,
+    userRights: userRights,
+    changeUserRights: changeUserRights,
+    deleteUser: deleteUser,
+    usersByProjectId: usersByProjectId,
+    inviteUser: inviteUser,
+    validateInvitation: validateInvitation
   });
 
   //GRPC stream log service

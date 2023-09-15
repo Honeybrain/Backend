@@ -168,17 +168,15 @@ try {
 async function inviteUser(call, callback) {
 const destinataire = call.request.getEmail();
 const sujet = 'Création de compte honeybrain';
-const id = crypto.randomBytes(32).toString('hex');
 const token = crypto.randomBytes(32).toString('hex');
 const message = 'Bonjour,\nAfin de créer votre compte honeybrain veuillez ouvrir le lien suivant: ' + token;
 const expiryDate = new Date();
 expiryDate.setHours(expiryDate.getHours() + 24);
 
-set(ref(database, 'invits/' + id), {
+set(ref(database, 'invits/' + token), {
     email: destinataire,
     expiryDate: expiryDate,
     isUsed: false,
-    token: token
 });
 
 
@@ -201,6 +199,24 @@ try {
 }
 }
 
+async function validateInvitation(call, callback) {
+    const token = call.request.getToken();
+    try {
+        const snapshot = await get(child(dbRef, "invits/"));
+        if (snapshot.isUsed == false) {
+            set(ref(database, 'invits/' + token), {
+                isUsed: true,
+            });
+            const reply = new messages.UserResponse();
+            reply.setEmail(snapshot.email);
+            reply.setMessage('Valid invitation');
+            callback(null, reply);
+        }
+    } catch (error) {
+        callback(error)
+    }
+}
+
 
 module.exports = {
     signIn: signIn,
@@ -213,4 +229,5 @@ module.exports = {
     deleteUser: deleteUser,
     usersByProjectId: usersByProjectId,
     inviteUser: inviteUser,
+    validateInvitation: validateInvitation
 };
