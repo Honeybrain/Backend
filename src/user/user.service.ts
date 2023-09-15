@@ -34,7 +34,7 @@ export class UserService implements OnModuleInit {
 
   async signIn(signInSignUpDto: SignInSignUpDto): Promise<UserResponseDto> {
     const user = await this.usersRepository.findByEmail(signInSignUpDto.email);
-    if (compareSync(user.password, signInSignUpDto.password)) throw new RpcException('WRONG_PASSWORD');
+    if (!compareSync(signInSignUpDto.password, user.password)) throw new RpcException('WRONG_PASSWORD');
     return { message: 'User signed in successfully', token: this.jwtService.sign({ id: user._id }) };
   }
 
