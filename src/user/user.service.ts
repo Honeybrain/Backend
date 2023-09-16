@@ -81,20 +81,20 @@ export class UserService implements OnModuleInit {
       throw new RpcException(err);
     });
 
-    const activationLink = `http://localhost:3000/activate/${activationToken}`;
-    const mailService = new MailService();
-    mailService.sendActivationMail(email, activationLink);
+    // const activationLink = `http://localhost:3000/activate/${activationToken}`;
+    // const mailService = new MailService();
+    // mailService.sendActivationMail(email, activationLink);
 
     return { message: 'User invited successfully. Activation email sent.' };
   }
 
   async activateUser(activationToken: string) {
-    const user = await this.invitationsRepository.findByToken(activationToken);
-    if (!user) {
+    const invitation = await this.invitationsRepository.findByToken(activationToken);
+    if (!invitation) {
       throw new Error('Invalid activation token');
     }
 
-    await this.usersRepository.markActivated(user._id);
+    await this.usersRepository.markActivated(invitation.user._id);
     await this.invitationsRepository.markUsed(activationToken);
 
     return { message: 'User activated successfully' };

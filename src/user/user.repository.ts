@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
 import { hashSync } from 'bcrypt';
@@ -53,8 +53,8 @@ export class UserRepository {
     return user.save();
   }
 
-  async markActivated(userId: string): Promise<UserDocument> {
-    const user = await this.findById(userId);
+  async markActivated(userId: Types.ObjectId): Promise<UserDocument> {
+    const user = await this.findById(userId.toString());
     if (user.activated) {
       throw new RpcException('USER_ALREADY_ACTIVATED');
     }

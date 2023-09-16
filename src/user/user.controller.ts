@@ -42,7 +42,7 @@ export class UserController {
     return await this.userService.inviteUser(data.email, data.admin);
   }
 
-  @GrpcMethod('UserService', 'ActivateUser')
+  @GrpcMethod('User', 'ActivateUser')
   async activateUser(data: ActivateUserRequestDto): Promise<EmptyResponseDto> {
     return await this.userService.activateUser(data.token);
   }
