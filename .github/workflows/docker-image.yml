@@ -29,7 +29,7 @@ jobs:
     - name: Build protos
       run: |
         cd ../Honeypot
-        chmod 777 ./scripts/make_backend_proto.sh
+        chmod 777 ./scripts/make_backend_protos.sh
         ./scripts/make_backend_protos.sh ./protos ../Backend
     - name: Build the Backend image
       run: |
