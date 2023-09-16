@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
-import { SignInSignUpDto } from './_utils/dto/request/sign-in-sign-up.dto';
 import { hashSync } from 'bcrypt';
 import { RpcException } from '@nestjs/microservices';
 
