@@ -4,9 +4,12 @@ RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/l
 
 WORKDIR /app
 
-COPY . .
+COPY ./package.json ./
+COPY ./yarn.lock ./
 
 RUN yarn install
+
+COPY . .
 
 EXPOSE 50051
 
