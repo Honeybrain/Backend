@@ -26,6 +26,7 @@
     "@nestjs/passport": "^10.0.1",
     "@nestjs/platform-express": "^10.2.2",
     "@nestjs/swagger": "^7.1.10",
+    "grpc-tools": "^1.12.4",
     "bcrypt": "^5.1.1",
     "chokidar": "^3.5.3",
     "class-transformer": "^0.5.1",
