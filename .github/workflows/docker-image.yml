@@ -26,11 +26,11 @@ jobs:
       run: |
         cd ..
         git clone https://github.com/Honeybrain/Honeypot
-        cd Honeypot
     - name: Build protos
       run: |
+        cd ../Honeypot
         chmod 777 ./scripts/make_backend_proto.sh
-        ./scripts/make_backend_proto.sh ./protos ../Backend
+        ./scripts/make_backend_protos.sh ./protos ../Backend
     - name: Build the Backend image
       run: |
         docker build -t $DOCKER_USER/hb_dashboard_back .
