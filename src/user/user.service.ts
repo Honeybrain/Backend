@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from '../_utils/config/config';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './user.schema';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -75,8 +76,9 @@ export class UserService implements OnModuleInit {
       throw new RpcException(err);
     });
 
-    //const activationLink = `http://localhost:3000/activate/${activationToken}`;
-    //mailService.sendActivationMail(email, activationLink);
+    const activationLink = `http://localhost:3000/activate/${activationToken}`;
+    const mailService = new MailService();
+    mailService.sendActivationMail(email, activationLink);
 
     return { message: 'User invited successfully. Activation email sent.' };
   }
