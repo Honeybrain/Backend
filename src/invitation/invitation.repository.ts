@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Invitation, InvitationDocument } from './invitation.schema';
 import { RpcException } from '@nestjs/microservices';
@@ -8,15 +8,15 @@ import { RpcException } from '@nestjs/microservices';
 export class InvitationRepository {
   constructor(@InjectModel(Invitation.name) private model: Model<InvitationDocument>) {}
 
-  createInvitation = (email: string, token: string) => {
+  createInvitation = (userId: Types.ObjectId, token: string) => {
     const expirationDate = new Date();
     expirationDate.setHours(expirationDate.getHours() + 24); // Token is valid for 24 hours
 
     return this.model.create({
-      email: email,
-      token: token,
+      user: userId,
+      activationToken: token,
       used: false,
-      expiresAt: expirationDate,
+      expirationDate: expirationDate,
     });
   };
 

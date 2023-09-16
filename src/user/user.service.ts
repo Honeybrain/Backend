@@ -73,11 +73,11 @@ export class UserService implements OnModuleInit {
       activated: false,
     };
 
-    await this.usersRepository.createUser(userModel).catch((err) => {
+    const user = await this.usersRepository.createUser(userModel).catch((err) => {
       throw new RpcException(err);
     });
 
-    await this.invitationsRepository.createInvitation(email, activationToken).catch((err) => {
+    await this.invitationsRepository.createInvitation(user._id, activationToken).catch((err) => {
       throw new RpcException(err);
     });
 
