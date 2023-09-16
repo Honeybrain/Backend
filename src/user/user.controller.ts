@@ -6,6 +6,8 @@ import { EmailRequestDto } from './_utils/dto/request/email-request.dto';
 import { PasswordRequestDto } from './_utils/dto/request/password-request.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { UserResponseDto } from './_utils/dto/response/user-response.dto';
+import { InviteUserRequestDto } from './_utils/dto/request/invite-user-request.dto';
+import { EmptyResponseDto } from './_utils/dto/response/empty-response.dto';
 
 @Controller('user')
 @ApiTags('User')
@@ -32,5 +34,10 @@ export class UserController {
   async resetPassword(data: PasswordRequestDto): Promise<UserResponseDto> {
     await this.userService.resetPassword(data.token, data.password);
     return { message: 'Mot de passe réinitialisé avec succès', token: 'null' };
+  }
+
+  @GrpcMethod('User', 'InviteUser')
+  async inviteUser(data: InviteUserRequestDto): Promise<EmptyResponseDto> {
+    return await this.userService.inviteUser(data.email, data.admin);
   }
 }

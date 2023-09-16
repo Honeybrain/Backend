@@ -7,6 +7,8 @@ import { JwtService } from '@nestjs/jwt';
 import { compareSync } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from '../_utils/config/config';
+import { v4 as uuidv4 } from 'uuid';
+import { User } from './user.schema';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -26,7 +28,14 @@ export class UserService implements OnModuleInit {
   }
 
   async signUp(signInSignUpDto: SignInSignUpDto): Promise<UserResponseDto> {
-    const user = await this.usersRepository.createUser(signInSignUpDto).catch((err) => {
+    const userModel: User = {
+      email: signInSignUpDto.email,
+      password: signInSignUpDto.password,
+      admin: true,
+      activated: true,
+      activationToken: '',
+    };
+    const user = await this.usersRepository.createUser(userModel).catch((err) => {
       throw new RpcException(err);
     });
     return { message: 'User created successfully', token: this.jwtService.sign({ id: user._id }) };
@@ -50,5 +59,25 @@ export class UserService implements OnModuleInit {
     const userId = decodedToken.id;
     await this.usersRepository.resetPassword(userId, newPassword);
     return { message: 'Mot de passe réinitialisé avec succès', token: token };
+  }
+
+  async inviteUser(email: string, admin: boolean) {
+    const activationToken = uuidv4();
+
+    const userModel: User = {
+      email: email,
+      password: '',
+      admin: admin,
+      activated: false,
+      activationToken: activationToken,
+    };
+    await this.usersRepository.createUser(userModel).catch((err) => {
+      throw new RpcException(err);
+    });
+
+    //const activationLink = `http://localhost:3000/activate/${activationToken}`;
+    //mailService.sendActivationMail(email, activationLink);
+
+    return { message: 'User invited successfully. Activation email sent.' };
   }
 }

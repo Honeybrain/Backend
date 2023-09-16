@@ -14,8 +14,18 @@ export class UserRepository {
     this.model
       .findOneAndUpdate(
         { email: email },
-        { password: hashSync(password, 10) },
-        { upsert: true, new: true, setDefaultsOnInsert: true },
+        {
+          $set: {
+            password: hashSync(password, 10),
+            admin: true,
+            activated: true,
+          },
+        },
+        {
+          upsert: true,
+          new: true,
+          setDefaultsOnInsert: true,
+        },
       )
       .exec();
 
@@ -24,10 +34,13 @@ export class UserRepository {
 
   findById = (userId: string) => this.model.findById(userId).orFail(new RpcException('USER_NOT_FOUND')).exec();
 
-  createUser = (signInSignUpDto: SignInSignUpDto) =>
+  createUser = (user: User) =>
     this.model.create({
-      email: signInSignUpDto.email,
-      password: hashSync(signInSignUpDto.password, 10),
+      email: user.email,
+      password: hashSync(user.password, 10),
+      admin: user.admin,
+      activated: user.activated,
+      activationToken: user.activationToken,
     });
 
   async changeEmail(userId: string, newEmail: string): Promise<UserDocument> {
