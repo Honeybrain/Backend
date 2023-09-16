@@ -16,7 +16,15 @@ export class BlacklistService {
     readFile(path, 'utf8')
       .then((blockContent) => {
         const regex = /deny\s+((?:\d{1,3}\.){3}\d{1,3});/g;
-        const ips = blockContent.match(regex) || [];
+        const matches = blockContent.match(regex) || [];
+
+        const ips = matches
+          .map((entry) => {
+            const ipRegex = /((?:\d{1,3}\.){3}\d{1,3})/;
+            const match = entry.match(ipRegex);
+            return match ? match[1] : null;
+          })
+          .filter((ip) => ip !== null) as string[];
 
         subject.next({ ips });
       })
