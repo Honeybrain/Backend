@@ -8,6 +8,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { UserResponseDto } from './_utils/dto/response/user-response.dto';
 import { InviteUserRequestDto } from './_utils/dto/request/invite-user-request.dto';
 import { EmptyResponseDto } from './_utils/dto/response/empty-response.dto';
+import { ActivateUserRequestDto } from './_utils/dto/request/activate-request-dto';
 
 @Controller('user')
 @ApiTags('User')
@@ -39,5 +40,10 @@ export class UserController {
   @GrpcMethod('User', 'InviteUser')
   async inviteUser(data: InviteUserRequestDto): Promise<EmptyResponseDto> {
     return await this.userService.inviteUser(data.email, data.admin);
+  }
+
+  @GrpcMethod('UserService', 'ActivateUser')
+  async activateUser(data: ActivateUserRequestDto): Promise<EmptyResponseDto> {
+    return await this.userService.activateUser(data.token);
   }
 }

@@ -52,4 +52,13 @@ export class UserRepository {
     user.password = hashSync(newPassword, 10);
     return user.save();
   }
+
+  async markActivated(userId: string): Promise<UserDocument> {
+    const user = await this.findById(userId);
+    if (user.activated) {
+      throw new RpcException('USER_ALREADY_ACTIVATED');
+    }
+    user.activated = true;
+    return user.save();
+  }
 }

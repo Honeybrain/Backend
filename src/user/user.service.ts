@@ -87,4 +87,16 @@ export class UserService implements OnModuleInit {
 
     return { message: 'User invited successfully. Activation email sent.' };
   }
+
+  async activateUser(activationToken: string) {
+    const user = await this.invitationsRepository.findByToken(activationToken);
+    if (!user) {
+      throw new Error('Invalid activation token');
+    }
+
+    await this.usersRepository.markActivated(user._id);
+    await this.invitationsRepository.markUsed(activationToken);
+
+    return { message: 'User activated successfully' };
+  }
 }
