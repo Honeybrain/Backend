@@ -39,7 +39,6 @@ export class UserRepository {
       password: hashSync(user.password, 10),
       admin: user.admin,
       activated: user.activated,
-      activationToken: user.activationToken,
     });
 
   async changeEmail(userId: string, newEmail: string): Promise<UserDocument> {
