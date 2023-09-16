@@ -16,9 +16,6 @@ export class User {
 
   @Prop({ required: true })
   activated: boolean;
-
-  @Prop({ required: false })
-  activationToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

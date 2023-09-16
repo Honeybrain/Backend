@@ -10,12 +10,14 @@ import { EnvironmentVariables } from '../_utils/config/config';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './user.schema';
 import { MailService } from '../mail/mail.service';
+import { InvitationRepository } from 'src/invitation/invitation.repository';
 
 @Injectable()
 export class UserService implements OnModuleInit {
   constructor(
     private readonly jwtService: JwtService,
     private readonly usersRepository: UserRepository,
+    private readonly invitationsRepository: InvitationRepository,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
   ) {}
 
@@ -34,7 +36,6 @@ export class UserService implements OnModuleInit {
       password: signInSignUpDto.password,
       admin: true,
       activated: true,
-      activationToken: '',
     };
     const user = await this.usersRepository.createUser(userModel).catch((err) => {
       throw new RpcException(err);
@@ -70,9 +71,13 @@ export class UserService implements OnModuleInit {
       password: '',
       admin: admin,
       activated: false,
-      activationToken: activationToken,
     };
+
     await this.usersRepository.createUser(userModel).catch((err) => {
+      throw new RpcException(err);
+    });
+
+    await this.invitationsRepository.createInvitation(email, activationToken).catch((err) => {
       throw new RpcException(err);
     });
 
