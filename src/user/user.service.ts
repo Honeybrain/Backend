@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from '../_utils/config/config';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './user.schema';
-import { MailService } from '../mail/mail.service';
+import { status } from '@grpc/grpc-js';
 import { InvitationRepository } from 'src/invitation/invitation.repository';
 
 @Injectable()
@@ -73,25 +73,36 @@ export class UserService implements OnModuleInit {
       activated: false,
     };
 
-    const user = await this.usersRepository.createUser(userModel).catch((err) => {
-      throw new RpcException(err);
-    });
+    try {
+      const user = await this.usersRepository.createUser(userModel);
 
-    await this.invitationsRepository.createInvitation(user._id, activationToken).catch((err) => {
-      throw new RpcException(err);
-    });
+      await this.invitationsRepository.createInvitation(user._id, activationToken);
 
-    // const activationLink = `http://localhost:3000/activate/${activationToken}`;
-    // const mailService = new MailService();
-    // mailService.sendActivationMail(email, activationLink);
+      // const activationLink = `http://localhost:3000/activate/${activationToken}`;
+      // const mailService = new MailService();
+      // mailService.sendActivationMail(email, activationLink);
 
-    return { message: 'User invited successfully. Activation email sent.' };
+      return { message: 'User invited successfully. Activation email sent.' };
+    } catch (error) {
+      if (error.code === 11000 && error.message.includes('email')) {
+        throw new RpcException({
+          code: status.ALREADY_EXISTS,
+          message: 'An account with this email already exists.',
+        });
+      }
+      throw new RpcException(error);
+    }
   }
 
   async activateUser(activationToken: string) {
     const invitation = await this.invitationsRepository.findByToken(activationToken);
     if (!invitation) {
       throw new Error('Invalid activation token');
+    }
+
+    const currentDate = new Date();
+    if (invitation.expirationDate <= currentDate) {
+      throw new Error('Activation token has expired');
     }
 
     await this.usersRepository.markActivated(invitation.user._id);
