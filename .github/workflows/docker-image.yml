@@ -2,7 +2,7 @@ name: Docker Backend
 
 on:
   push:
-    branches: [ Docker_prod_fix ]
+    branches: [ main ]
 
 env:
   DOCKER_USER: ${{ secrets.DOCKER_USER }}
