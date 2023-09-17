@@ -12,6 +12,7 @@ import { User } from './user.schema';
 import { status } from '@grpc/grpc-js';
 import { InvitationRepository } from 'src/invitation/invitation.repository';
 import { GetUsersDto } from './_utils/dto/response/get-users-response.dto';
+import { ChangeRightsRequestDto } from './_utils/dto/request/change-rights-request.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -112,12 +113,18 @@ export class UserService implements OnModuleInit {
     return { message: 'User activated successfully' };
   }
 
+  async changeRights(changeRightsRequestDto: ChangeRightsRequestDto) {
+    await this.usersRepository.markRight(changeRightsRequestDto.email, changeRightsRequestDto.admin);
+
+    return { message: 'User rights changed successfully' };
+  }
+
   async findAllUsers(): Promise<GetUsersDto> {
     const rawUsers = await this.usersRepository.findAllUsers();
 
     const users = rawUsers.map((user) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, __v, ...rest } = user.toObject();
+      const { password, __v, _id, ...rest } = user.toObject();
       return JSON.stringify(rest);
     });
 

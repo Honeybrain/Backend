@@ -63,4 +63,10 @@ export class UserRepository {
     user.activated = true;
     return user.save();
   }
+
+  async markRight(email: string, admin: boolean): Promise<UserDocument> {
+    const user = await this.findByEmail(email);
+    user.admin = admin;
+    return user.save();
+  }
 }

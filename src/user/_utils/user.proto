@@ -38,6 +38,11 @@ message ActivateUserRequest {
   string token = 1;
 }
 
+message ChangeRightsRequest {
+  string email = 1;
+  bool admin = 2;
+}
+
 message GetUsersRequest {
 }
 
@@ -53,5 +58,6 @@ service User {
   rpc ChangeEmail(EmailRequest) returns (UserResponse);
   rpc InviteUser(InviteUserRequest) returns (EmptyResponse);
   rpc ActivateUser(ActivateUserRequest) returns (EmptyResponse);
+  rpc ChangeRights(ChangeRightsRequest) returns (EmptyResponse);
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
 }
