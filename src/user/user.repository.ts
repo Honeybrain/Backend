@@ -33,6 +33,8 @@ export class UserRepository {
 
   findById = (userId: string) => this.model.findById(userId).orFail(new RpcException('USER_NOT_FOUND')).exec();
 
+  findAllUsers = () => this.model.find().exec();
+
   createUser = (user: User) =>
     this.model.create({
       email: user.email,

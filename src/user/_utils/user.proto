@@ -38,6 +38,13 @@ message ActivateUserRequest {
   string token = 1;
 }
 
+message GetUsersRequest {
+}
+
+message GetUsersResponse {
+  repeated string users = 1;
+}
+
 // The UserService defines the methods that our service exposes
 service User {
   rpc SignIn(SignInSignUpRequest) returns (UserResponse);
@@ -46,4 +53,5 @@ service User {
   rpc ChangeEmail(EmailRequest) returns (UserResponse);
   rpc InviteUser(InviteUserRequest) returns (EmptyResponse);
   rpc ActivateUser(ActivateUserRequest) returns (EmptyResponse);
+  rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
 }

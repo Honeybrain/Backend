@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { User } from './user.schema';
 import { status } from '@grpc/grpc-js';
 import { InvitationRepository } from 'src/invitation/invitation.repository';
+import { GetUsersDto } from './_utils/dto/response/get-users-response.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -109,5 +110,17 @@ export class UserService implements OnModuleInit {
     await this.invitationsRepository.markUsed(activationToken);
 
     return { message: 'User activated successfully' };
+  }
+
+  async findAllUsers(): Promise<GetUsersDto> {
+    const rawUsers = await this.usersRepository.findAllUsers();
+
+    const users = rawUsers.map((user) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, __v, ...rest } = user.toObject();
+      return JSON.stringify(rest);
+    });
+
+    return { users };
   }
 }
