@@ -66,4 +66,10 @@ export class UserRepository {
       .findOneAndUpdate({ email }, { admin: admin }, { new: true })
       .orFail(new RpcException('USER_NOT_FOUND'))
       .exec();
+
+  updateDeleteById = (userId: string) => 
+  this.model
+  .findByIdAndDelete(userId)
+  .orFail(new RpcException('USER_NOT_FOUND'))
+  .exec();
 }

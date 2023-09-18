@@ -59,4 +59,9 @@ export class UserController {
   getUsers(): Promise<GetUsersListDto> {
     return this.userService.findAllUsers();
   }
+
+  @GrpcMethod('User', 'DeleteUser')
+  deleteUser(userId: string): Promise<GetEmptyDto> {
+    return this.userService.deleteUser(userId);
+  }
 }
