@@ -41,6 +41,10 @@ message GetUsersResponse {
   repeated string users = 1;
 }
 
+message DeleteUserRequest {
+  string email = 1;
+}
+
 // The UserService defines the methods that our service exposes
 service User {
   rpc SignIn(SignInSignUpRequest) returns (UserResponse);
@@ -51,4 +55,5 @@ service User {
   rpc ActivateUser(EmptyRequest) returns (EmptyResponse);
   rpc ChangeRights(ChangeRightsRequest) returns (EmptyResponse);
   rpc GetUsers(EmptyRequest) returns (GetUsersResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (EmptyResponse);
 }

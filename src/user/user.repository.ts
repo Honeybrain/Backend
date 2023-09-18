@@ -61,15 +61,22 @@ export class UserRepository {
       .orFail(new RpcException('USER_NOT_FOUND'))
       .exec();
 
-  updateRightByUserEmail = (email: string, admin: boolean): Promise<UserDocument> =>
-    this.model
-      .findOneAndUpdate({ email }, { admin: admin }, { new: true })
+  updateRightByUserEmail = (email: string, admin?: boolean): Promise<UserDocument> => {
+    if (admin === undefined) {
+      admin = false;
+    }
+
+    return this.model
+      .findOneAndUpdate({ email }, { admin }, { new: true })
       .orFail(new RpcException('USER_NOT_FOUND'))
       .exec();
+  };
 
-  updateDeleteById = (userId: string) => 
-  this.model
-  .findByIdAndDelete(userId)
-  .orFail(new RpcException('USER_NOT_FOUND'))
-  .exec();
+  updateDeleteByUserEmail = async (email: string) => {
+    const user = await this.findByEmail(email);
+    return this.updateDeleteById(user._id);
+  };
+
+  updateDeleteById = (userId: Types.ObjectId) =>
+    this.model.findByIdAndDelete(userId).orFail(new RpcException('USER_NOT_FOUND')).exec();
 }

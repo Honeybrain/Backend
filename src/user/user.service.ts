@@ -122,9 +122,9 @@ export class UserService implements OnModuleInit {
     return { users: mappedUsers };
   }
 
-  async deleteUser(userId: string) {
-    await this.usersRepository.updateDeleteById(userId);
-    
-    return { message: 'User created successfully' };
+  async deleteUser(email: string) {
+    await this.usersRepository.updateDeleteByUserEmail(email);
+
+    return { message: 'User deleted successfully' };
   }
 }
