@@ -61,7 +61,7 @@ export class UserController {
   }
 
   @GrpcMethod('User', 'DeleteUser')
-  deleteUser(email: string): Promise<GetEmptyDto> {
-    return this.userService.deleteUser(email);
+  deleteUser(emailRequestDto: EmailRequestDto): Promise<GetEmptyDto> {
+    return this.userService.deleteUser(emailRequestDto);
   }
 }

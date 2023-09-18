@@ -14,6 +14,7 @@ import { InvitationRepository } from 'src/invitation/invitation.repository';
 import { ChangeRightsRequestDto } from './_utils/dto/request/change-rights-request.dto';
 import { GetEmptyDto } from '../_utils/dto/response/get-empty.dto';
 import { GetUsersListDto } from './_utils/dto/response/get-users-list.dto';
+import { EmailRequestDto } from './_utils/dto/request/email-request.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -122,8 +123,8 @@ export class UserService implements OnModuleInit {
     return { users: mappedUsers };
   }
 
-  async deleteUser(email: string) {
-    await this.usersRepository.updateDeleteByUserEmail(email);
+  async deleteUser(emailRequestDto: EmailRequestDto) {
+    await this.usersRepository.updateDeleteByUserEmail(emailRequestDto.email);
 
     return { message: 'User deleted successfully' };
   }
