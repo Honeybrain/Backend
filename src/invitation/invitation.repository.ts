@@ -14,6 +14,9 @@ export class InvitationRepository {
   findByToken = (token: string) =>
     this.model.findOne({ activationToken: token }).orFail(new RpcException('INVITATION_NOT_FOUND')).exec();
 
-  markUsed = (token: string): Promise<InvitationDocument> =>
-    this.model.findByIdAndUpdate(token, { used: true }).orFail(new RpcException('INVITATION_NOT_FOUND')).exec();
+  markUsed = async (token: string): Promise<InvitationDocument> => {
+    const invitation = await this.findByToken(token);
+    invitation.used = true;
+    return invitation.save();
+  };
 }
