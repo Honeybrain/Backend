@@ -1,6 +1,6 @@
 import { IsArray, IsString } from 'class-validator';
 
-export class GetUsersDto {
+export class GetUsersListDto {
   @IsArray()
   @IsString({ each: true })
   users: string[];

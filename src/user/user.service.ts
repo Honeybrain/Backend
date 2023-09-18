@@ -8,11 +8,12 @@ import { compareSync } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from '../_utils/config/config';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from './user.schema';
+import { User, UserDocument } from './user.schema';
 import { status } from '@grpc/grpc-js';
 import { InvitationRepository } from 'src/invitation/invitation.repository';
-import { GetUsersDto } from './_utils/dto/response/get-users-response.dto';
 import { ChangeRightsRequestDto } from './_utils/dto/request/change-rights-request.dto';
+import { GetEmptyDto } from '../_utils/dto/response/get-empty.dto';
+import { GetUsersListDto } from './_utils/dto/response/get-users-list.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -47,30 +48,27 @@ export class UserService implements OnModuleInit {
 
   async signIn(signInSignUpDto: SignInSignUpDto): Promise<UserResponseDto> {
     const user = await this.usersRepository.findByEmail(signInSignUpDto.email);
-    if (!compareSync(signInSignUpDto.password, user.password)) throw new RpcException('WRONG_PASSWORD');
+    if (user.password && !compareSync(signInSignUpDto.password, user.password))
+      throw new RpcException('WRONG_PASSWORD');
     return { message: 'User signed in successfully', token: this.jwtService.sign({ id: user._id }) };
   }
 
-  async changeEmail(token: string, newEmail: string): Promise<UserResponseDto> {
-    const decodedToken = this.jwtService.decode(token) as any;
-    const userId = decodedToken.id;
-    await this.usersRepository.changeEmail(userId, newEmail);
-    return { message: 'E-mail modifié avec succès', token: token };
-  }
+  changeEmail = (newEmail: string, user: UserDocument): Promise<GetEmptyDto> =>
+    this.usersRepository
+      .updateEmailByUserId(user._id, newEmail)
+      .then(() => ({ message: 'E-mail modifié avec succès' }));
 
-  async resetPassword(token: string, newPassword: string): Promise<UserResponseDto> {
-    const decodedToken = this.jwtService.decode(token) as any;
-    const userId = decodedToken.id;
-    await this.usersRepository.resetPassword(userId, newPassword);
-    return { message: 'Mot de passe réinitialisé avec succès', token: token };
-  }
+  resetPassword = (newPassword: string, user: UserDocument): Promise<GetEmptyDto> =>
+    this.usersRepository
+      .updatePasswordByUserId(user._id, newPassword)
+      .then(() => ({ message: 'Mot de passe modifié avec succès' }));
 
   async inviteUser(email: string, admin: boolean) {
     const activationToken = uuidv4();
 
     const userModel: User = {
       email: email,
-      password: '',
+      password: null,
       admin: admin,
       activated: false,
     };
@@ -98,36 +96,29 @@ export class UserService implements OnModuleInit {
 
   async activateUser(activationToken: string) {
     const invitation = await this.invitationsRepository.findByToken(activationToken);
-    if (!invitation) {
-      throw new Error('Invalid activation token');
-    }
 
     const currentDate = new Date();
-    if (invitation.expirationDate <= currentDate) {
-      throw new Error('Activation token has expired');
-    }
+    if (invitation.expirationDate <= currentDate) throw new RpcException('Activation token has expired');
 
-    await this.usersRepository.markActivated(invitation.user._id);
+    await this.usersRepository.activateUserById(invitation.user._id);
     await this.invitationsRepository.markUsed(activationToken);
 
     return { message: 'User activated successfully' };
   }
 
   async changeRights(changeRightsRequestDto: ChangeRightsRequestDto) {
-    await this.usersRepository.markRight(changeRightsRequestDto.email, changeRightsRequestDto.admin);
+    await this.usersRepository.updateRightByUserEmail(changeRightsRequestDto.email, changeRightsRequestDto.admin);
 
     return { message: 'User rights changed successfully' };
   }
 
-  async findAllUsers(): Promise<GetUsersDto> {
-    const rawUsers = await this.usersRepository.findAllUsers();
+  async findAllUsers(): Promise<GetUsersListDto> {
+    const users = await this.usersRepository.findAllUsers();
 
-    const users = rawUsers.map((user) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, __v, _id, ...rest } = user.toObject();
-      return JSON.stringify(rest);
-    });
+    const mappedUsers = users.map((user) =>
+      JSON.stringify({ id: user._id, email: user.email, admin: user.admin, activated: user.activated }),
+    );
 
-    return { users };
+    return { users: mappedUsers };
   }
 }

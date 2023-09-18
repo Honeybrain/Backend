@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import * as dayjs from 'dayjs';
 
 export type InvitationDocument = Document & Invitation;
 
@@ -11,7 +12,7 @@ export class Invitation {
   @Prop({ required: true })
   activationToken: string;
 
-  @Prop({ required: true })
+  @Prop({ default: () => dayjs().add(1, 'day').toDate() })
   expirationDate: Date;
 
   @Prop({ default: false })

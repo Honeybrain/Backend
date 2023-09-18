@@ -20,13 +20,11 @@ message EmptyResponse {
 }
 
 message PasswordRequest {
-  string token = 1;
-  string password = 2;
+  string password = 1;
 }
 
 message EmailRequest {
-  string token = 1;
-  string email = 2;
+  string email = 1;
 }
 
 message InviteUserRequest {
@@ -34,16 +32,9 @@ message InviteUserRequest {
   bool admin = 2;
 }
 
-message ActivateUserRequest {
-  string token = 1;
-}
-
 message ChangeRightsRequest {
   string email = 1;
   bool admin = 2;
-}
-
-message GetUsersRequest {
 }
 
 message GetUsersResponse {
@@ -54,10 +45,10 @@ message GetUsersResponse {
 service User {
   rpc SignIn(SignInSignUpRequest) returns (UserResponse);
   rpc SignUp(SignInSignUpRequest) returns (UserResponse);
-  rpc ResetPassword(PasswordRequest) returns (UserResponse);
-  rpc ChangeEmail(EmailRequest) returns (UserResponse);
+  rpc ResetPassword(PasswordRequest) returns (EmptyResponse);
+  rpc ChangeEmail(EmailRequest) returns (EmptyResponse);
   rpc InviteUser(InviteUserRequest) returns (EmptyResponse);
-  rpc ActivateUser(ActivateUserRequest) returns (EmptyResponse);
+  rpc ActivateUser(EmptyRequest) returns (EmptyResponse);
   rpc ChangeRights(ChangeRightsRequest) returns (EmptyResponse);
-  rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
+  rpc GetUsers(EmptyRequest) returns (GetUsersResponse);
 }

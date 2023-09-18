@@ -8,24 +8,12 @@ import { RpcException } from '@nestjs/microservices';
 export class InvitationRepository {
   constructor(@InjectModel(Invitation.name) private model: Model<InvitationDocument>) {}
 
-  createInvitation = (userId: Types.ObjectId, token: string) => {
-    const expirationDate = new Date();
-    expirationDate.setHours(expirationDate.getHours() + 24); // Token is valid for 24 hours
-
-    return this.model.create({
-      user: userId,
-      activationToken: token,
-      used: false,
-      expirationDate: expirationDate,
-    });
-  };
+  createInvitation = (userId: Types.ObjectId, token: string) =>
+    this.model.create({ user: userId, activationToken: token });
 
   findByToken = (token: string) =>
     this.model.findOne({ activationToken: token }).orFail(new RpcException('INVITATION_NOT_FOUND')).exec();
 
-  async markUsed(token: string): Promise<InvitationDocument> {
-    const invitation = await this.findByToken(token);
-    invitation.used = true;
-    return invitation.save();
-  }
+  markUsed = (token: string): Promise<InvitationDocument> =>
+    this.model.findByIdAndUpdate(token, { used: true }).orFail(new RpcException('INVITATION_NOT_FOUND')).exec();
 }

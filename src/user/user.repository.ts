@@ -33,40 +33,37 @@ export class UserRepository {
 
   findById = (userId: string) => this.model.findById(userId).orFail(new RpcException('USER_NOT_FOUND')).exec();
 
-  findAllUsers = () => this.model.find().exec();
+  findAllUsers = () => this.model.find().lean().exec();
 
   createUser = (user: User) =>
     this.model.create({
       email: user.email,
-      password: hashSync(user.password, 10),
+      password: user.password && hashSync(user.password, 10),
       admin: user.admin,
       activated: user.activated,
     });
 
-  async changeEmail(userId: string, newEmail: string): Promise<UserDocument> {
-    const user = await this.findById(userId);
-    user.email = newEmail;
-    return user.save();
-  }
+  updateEmailByUserId = (userId: Types.ObjectId, newEmail: string): Promise<UserDocument> =>
+    this.model
+      .findByIdAndUpdate(userId, { email: newEmail }, { new: true })
+      .orFail(new RpcException('USER_NOT_FOUND'))
+      .exec();
 
-  async resetPassword(userId: string, newPassword: string): Promise<UserDocument> {
-    const user = await this.findById(userId);
-    user.password = hashSync(newPassword, 10);
-    return user.save();
-  }
+  updatePasswordByUserId = (userId: Types.ObjectId, newPassword: string): Promise<UserDocument> =>
+    this.model
+      .findByIdAndUpdate(userId, { password: hashSync(newPassword, 10) }, { new: true })
+      .orFail(new RpcException('USER_NOT_FOUND'))
+      .exec();
 
-  async markActivated(userId: Types.ObjectId): Promise<UserDocument> {
-    const user = await this.findById(userId.toString());
-    if (user.activated) {
-      throw new RpcException('USER_ALREADY_ACTIVATED');
-    }
-    user.activated = true;
-    return user.save();
-  }
+  activateUserById = (userId: Types.ObjectId): Promise<UserDocument> =>
+    this.model
+      .findByIdAndUpdate(userId, { activated: true }, { new: true })
+      .orFail(new RpcException('USER_NOT_FOUND'))
+      .exec();
 
-  async markRight(email: string, admin: boolean): Promise<UserDocument> {
-    const user = await this.findByEmail(email);
-    user.admin = admin;
-    return user.save();
-  }
+  updateRightByUserEmail = (email: string, admin: boolean): Promise<UserDocument> =>
+    this.model
+      .findOneAndUpdate({ email }, { admin: admin }, { new: true })
+      .orFail(new RpcException('USER_NOT_FOUND'))
+      .exec();
 }

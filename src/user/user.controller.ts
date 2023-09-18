@@ -1,16 +1,17 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { GrpcMethod } from '@nestjs/microservices';
 import { SignInSignUpDto } from './_utils/dto/request/sign-in-sign-up.dto';
 import { EmailRequestDto } from './_utils/dto/request/email-request.dto';
 import { PasswordRequestDto } from './_utils/dto/request/password-request.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { UserResponseDto } from './_utils/dto/response/user-response.dto';
 import { InviteUserRequestDto } from './_utils/dto/request/invite-user-request.dto';
-import { EmptyResponseDto } from './_utils/dto/response/empty-response.dto';
+import { GetEmptyDto } from '../_utils/dto/response/get-empty.dto';
 import { ActivateUserRequestDto } from './_utils/dto/request/activate-request.dto';
-import { GetUsersDto } from './_utils/dto/response/get-users-response.dto';
 import { ChangeRightsRequestDto } from './_utils/dto/request/change-rights-request.dto';
+import { GrpcAuthGuard } from './_utils/jwt/grpc-auth.guard';
+import { MetadataWithUser } from './_utils/interface/metadata-with-user.interface';
+import { GetUsersListDto } from './_utils/dto/response/get-users-list.dto';
 
 @Controller('user')
 @ApiTags('User')
@@ -27,35 +28,35 @@ export class UserController {
     return this.userService.signIn(signInSignUpDto);
   }
 
+  @UseGuards(GrpcAuthGuard)
   @GrpcMethod('User', 'ChangeEmail')
-  async changeEmail(data: EmailRequestDto): Promise<UserResponseDto> {
-    await this.userService.changeEmail(data.token, data.email);
-    return { message: 'E-mail modifié avec succès', token: 'null' };
+  changeEmail(data: EmailRequestDto, meta: MetadataWithUser): Promise<GetEmptyDto> {
+    return this.userService.changeEmail(data.email, meta.user);
   }
 
+  @UseGuards(GrpcAuthGuard)
   @GrpcMethod('User', 'ResetPassword')
-  async resetPassword(data: PasswordRequestDto): Promise<UserResponseDto> {
-    await this.userService.resetPassword(data.token, data.password);
-    return { message: 'Mot de passe réinitialisé avec succès', token: 'null' };
+  resetPassword(data: PasswordRequestDto, meta: MetadataWithUser): Promise<GetEmptyDto> {
+    return this.userService.resetPassword(data.password, meta.user);
   }
 
   @GrpcMethod('User', 'InviteUser')
-  async inviteUser(data: InviteUserRequestDto): Promise<EmptyResponseDto> {
-    return await this.userService.inviteUser(data.email, data.admin);
+  inviteUser(data: InviteUserRequestDto): Promise<GetEmptyDto> {
+    return this.userService.inviteUser(data.email, data.admin);
   }
 
   @GrpcMethod('User', 'ActivateUser')
-  async activateUser(data: ActivateUserRequestDto): Promise<EmptyResponseDto> {
-    return await this.userService.activateUser(data.token);
+  activateUser(data: ActivateUserRequestDto): Promise<GetEmptyDto> {
+    return this.userService.activateUser(data.token);
   }
 
   @GrpcMethod('User', 'ChangeRights')
-  async changeRights(data: ChangeRightsRequestDto): Promise<EmptyResponseDto> {
-    return await this.userService.changeRights(data);
+  changeRights(data: ChangeRightsRequestDto): Promise<GetEmptyDto> {
+    return this.userService.changeRights(data);
   }
 
   @GrpcMethod('User', 'GetUsers')
-  async getUsers(): Promise<GetUsersDto> {
-    return await this.userService.findAllUsers();
+  getUsers(): Promise<GetUsersListDto> {
+    return this.userService.findAllUsers();
   }
 }

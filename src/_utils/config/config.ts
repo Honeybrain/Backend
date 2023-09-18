@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { IsEmail, IsNumber, IsOptional, IsString, IsStrongPassword, validateSync } from 'class-validator';
+import { IsBoolean, IsEmail, IsNumber, IsOptional, IsString, IsStrongPassword, validateSync } from 'class-validator';
 import { exit } from 'process';
 
 export class EnvironmentVariables {
@@ -28,6 +28,24 @@ export class EnvironmentVariables {
     minSymbols: 1,
   })
   CREATE_ADMIN_PASSWORD: string = 'H0N3Y_Adm1n_PasS';
+
+  @IsString()
+  SMTP_HOST: string;
+
+  @IsString()
+  SMTP_FROM: string;
+
+  @IsNumber()
+  SMTP_PORT: number;
+
+  @IsString()
+  SMTP_USER: string;
+
+  @IsString()
+  SMTP_PASSWORD: string;
+
+  @IsBoolean()
+  SMTP_PREVIEW: boolean = false;
 }
 
 export function validateEnv(config: Record<string, unknown>) {
