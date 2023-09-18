@@ -12,6 +12,7 @@ import { ChangeRightsRequestDto } from './_utils/dto/request/change-rights-reque
 import { GrpcAuthGuard } from './_utils/jwt/grpc-auth.guard';
 import { MetadataWithUser } from './_utils/interface/metadata-with-user.interface';
 import { GetUsersListDto } from './_utils/dto/response/get-users-list.dto';
+import { ActivateResponseDto } from './_utils/dto/response/activate-response.dto';
 
 @Controller('user')
 @ApiTags('User')
@@ -46,8 +47,8 @@ export class UserController {
   }
 
   @GrpcMethod('User', 'ActivateUser')
-  activateUser(data: ActivateUserRequestDto): Promise<GetEmptyDto> {
-    return this.userService.activateUser(data.token);
+  activateUser(data: ActivateUserRequestDto): Promise<ActivateResponseDto> {
+    return this.userService.activateUser(data);
   }
 
   @GrpcMethod('User', 'ChangeRights')

@@ -43,6 +43,11 @@ message GetUsersResponse {
 
 message ActivateUserRequest {
   string token = 1;
+  string password = 2;
+}
+
+message ActivateUserResponse {
+  string token = 1;
 }
 
 // The UserService defines the methods that our service exposes
@@ -52,7 +57,7 @@ service User {
   rpc ResetPassword(PasswordRequest) returns (EmptyResponse);
   rpc ChangeEmail(EmailRequest) returns (EmptyResponse);
   rpc InviteUser(InviteUserRequest) returns (EmptyResponse);
-  rpc ActivateUser(ActivateUserRequest) returns (EmptyResponse);
+  rpc ActivateUser(ActivateUserRequest) returns (ActivateUserResponse);
   rpc ChangeRights(ChangeRightsRequest) returns (EmptyResponse);
   rpc GetUsers(EmptyRequest) returns (GetUsersResponse);
   rpc DeleteUser(EmailRequest) returns (EmptyResponse);

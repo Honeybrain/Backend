@@ -15,6 +15,8 @@ import { ChangeRightsRequestDto } from './_utils/dto/request/change-rights-reque
 import { GetEmptyDto } from '../_utils/dto/response/get-empty.dto';
 import { GetUsersListDto } from './_utils/dto/response/get-users-list.dto';
 import { EmailRequestDto } from './_utils/dto/request/email-request.dto';
+import { ActivateUserRequestDto } from './_utils/dto/request/activate-request.dto';
+import { ActivateResponseDto } from './_utils/dto/response/activate-response.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -95,16 +97,25 @@ export class UserService implements OnModuleInit {
     }
   }
 
-  async activateUser(activationToken: string) {
+  async activateUser(data: ActivateUserRequestDto): Promise<ActivateResponseDto> {
+    const activationToken = data.token;
+    const password = data.password;
     const invitation = await this.invitationsRepository.findByToken(activationToken);
+
+    if (invitation.used) {
+      throw new RpcException('Invitation has already been used');
+    }
 
     const currentDate = new Date();
     if (invitation.expirationDate <= currentDate) throw new RpcException('Activation token has expired');
 
+    await this.usersRepository.updatePasswordByUserId(invitation.user._id, password);
     await this.usersRepository.activateUserById(invitation.user._id);
     await this.invitationsRepository.markUsed(activationToken);
-
-    return { message: 'User activated successfully' };
+    const user = await this.usersRepository.findById(invitation.user._id.toString());
+    const token = await this.signIn({ email: user.email, password: password });
+    console.log(token);
+    return { token: token.token };
   }
 
   async changeRights(changeRightsRequestDto: ChangeRightsRequestDto) {
