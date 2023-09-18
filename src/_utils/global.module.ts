@@ -5,11 +5,15 @@ import { EnvironmentVariables } from './config/config';
 import { UserRepository } from '../user/user.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../user/user.schema';
+import { Invitation, InvitationSchema } from '../invitation/invitation.schema';
 
 @Global()
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Invitation.name, schema: InvitationSchema },
+    ]),
     JwtModule.registerAsync({
       useFactory: async (configService: ConfigService<EnvironmentVariables, true>) => ({
         secret: configService.get('JWT_SECRET'),

@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
-import { SignInSignUpDto } from './_utils/dto/request/sign-in-sign-up.dto';
 import { hashSync } from 'bcrypt';
 import { RpcException } from '@nestjs/microservices';
 
@@ -14,8 +13,18 @@ export class UserRepository {
     this.model
       .findOneAndUpdate(
         { email: email },
-        { password: hashSync(password, 10) },
-        { upsert: true, new: true, setDefaultsOnInsert: true },
+        {
+          $set: {
+            password: hashSync(password, 10),
+            admin: true,
+            activated: true,
+          },
+        },
+        {
+          upsert: true,
+          new: true,
+          setDefaultsOnInsert: true,
+        },
       )
       .exec();
 
@@ -24,21 +33,50 @@ export class UserRepository {
 
   findById = (userId: string) => this.model.findById(userId).orFail(new RpcException('USER_NOT_FOUND')).exec();
 
-  createUser = (signInSignUpDto: SignInSignUpDto) =>
+  findAllUsers = () => this.model.find().lean().exec();
+
+  createUser = (user: User) =>
     this.model.create({
-      email: signInSignUpDto.email,
-      password: hashSync(signInSignUpDto.password, 10),
+      email: user.email,
+      password: user.password && hashSync(user.password, 10),
+      admin: user.admin,
+      activated: user.activated,
     });
 
-  async changeEmail(userId: string, newEmail: string): Promise<UserDocument> {
-    const user = await this.findById(userId);
-    user.email = newEmail;
-    return user.save();
-  }
+  updateEmailByUserId = (userId: Types.ObjectId, newEmail: string): Promise<UserDocument> =>
+    this.model
+      .findByIdAndUpdate(userId, { email: newEmail }, { new: true })
+      .orFail(new RpcException('USER_NOT_FOUND'))
+      .exec();
 
-  async resetPassword(userId: string, newPassword: string): Promise<UserDocument> {
-    const user = await this.findById(userId);
-    user.password = hashSync(newPassword, 10);
-    return user.save();
-  }
+  updatePasswordByUserId = (userId: Types.ObjectId, newPassword: string): Promise<UserDocument> =>
+    this.model
+      .findByIdAndUpdate(userId, { password: hashSync(newPassword, 10) }, { new: true })
+      .orFail(new RpcException('USER_NOT_FOUND'))
+      .exec();
+
+  activateUserById = (userId: Types.ObjectId): Promise<UserDocument> =>
+    this.model
+      .findByIdAndUpdate(userId, { activated: true }, { new: true })
+      .orFail(new RpcException('USER_NOT_FOUND'))
+      .exec();
+
+  updateRightByUserEmail = (email: string, admin?: boolean): Promise<UserDocument> => {
+    if (admin === undefined) {
+      admin = false;
+    }
+
+    return this.model
+      .findOneAndUpdate({ email }, { admin }, { new: true })
+      .orFail(new RpcException('USER_NOT_FOUND'))
+      .exec();
+  };
+
+  updateDeleteByUserEmail = async (email: string) => {
+    const user = await this.findByEmail(email);
+    return this.updateDeleteById(user._id);
+  };
+
+  updateDeleteById = (userId: Types.ObjectId) =>
+    this.model.findByIdAndDelete(userId).orFail(new RpcException('USER_NOT_FOUND')).exec();
 }
