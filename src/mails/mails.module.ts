@@ -22,7 +22,6 @@ import { MailsService } from './mails.service';
       }),
     }),
   ],
-  controllers: [],
   providers: [MailsService],
   exports: [MailsService],
 })

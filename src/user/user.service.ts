@@ -14,11 +14,13 @@ import { InvitationRepository } from 'src/invitation/invitation.repository';
 import { ChangeRightsRequestDto } from './_utils/dto/request/change-rights-request.dto';
 import { GetEmptyDto } from '../_utils/dto/response/get-empty.dto';
 import { GetUsersListDto } from './_utils/dto/response/get-users-list.dto';
+import { MailsService } from '../mails/mails.service';
 import { EmailRequestDto } from './_utils/dto/request/email-request.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
   constructor(
+    private readonly mailsService: MailsService,
     private readonly jwtService: JwtService,
     private readonly usersRepository: UserRepository,
     private readonly invitationsRepository: InvitationRepository,
@@ -79,9 +81,8 @@ export class UserService implements OnModuleInit {
 
       await this.invitationsRepository.createInvitation(user._id, activationToken);
 
-      // const activationLink = `http://localhost:3000/activate/${activationToken}`;
-      // const mailService = new MailService();
-      // mailService.sendActivationMail(email, activationLink);
+      const activationLink = `http://localhost:3000/activate/${activationToken}`;
+      await this.mailsService.sendActivationMail(email, activationLink);
 
       return { message: 'User invited successfully. Activation email sent.' };
     } catch (error) {
@@ -123,9 +124,8 @@ export class UserService implements OnModuleInit {
     return { users: mappedUsers };
   }
 
-  async deleteUser(emailRequestDto: EmailRequestDto) {
-    await this.usersRepository.updateDeleteByUserEmail(emailRequestDto.email);
-
-    return { message: 'User deleted successfully' };
-  }
+  deleteUser = (emailRequestDto: EmailRequestDto) =>
+    this.usersRepository.updateDeleteByUserEmail(emailRequestDto.email).then(() => ({
+      message: 'User deleted successfully',
+    }));
 }
