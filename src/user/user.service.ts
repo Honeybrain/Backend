@@ -18,6 +18,7 @@ import { MailsService } from '../mails/mails.service';
 import { EmailRequestDto } from './_utils/dto/request/email-request.dto';
 import { ActivateUserRequestDto } from './_utils/dto/request/activate-request.dto';
 import { ActivateResponseDto } from './_utils/dto/response/activate-response.dto';
+import { Status } from '@grpc/grpc-js/build/src/constants';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -46,7 +47,7 @@ export class UserService implements OnModuleInit {
       activated: true,
     };
     const user = await this.usersRepository.createUser(userModel).catch((err) => {
-      throw new RpcException(err);
+      throw new RpcException({ code: Status.CANCELLED, message: err });
     });
     return { message: 'User created successfully', token: this.jwtService.sign({ id: user._id }) };
   }
@@ -54,7 +55,7 @@ export class UserService implements OnModuleInit {
   async signIn(signInSignUpDto: SignInSignUpDto): Promise<UserResponseDto> {
     const user = await this.usersRepository.findByEmail(signInSignUpDto.email);
     if (user.password && !compareSync(signInSignUpDto.password, user.password))
-      throw new RpcException('WRONG_PASSWORD');
+      throw new RpcException({ code: status.UNAUTHENTICATED, message: 'Wrong password' });
     return { message: 'User signed in successfully', token: this.jwtService.sign({ id: user._id }) };
   }
 
@@ -94,7 +95,7 @@ export class UserService implements OnModuleInit {
           message: 'An account with this email already exists.',
         });
       }
-      throw new RpcException(error);
+      throw new RpcException({ code: status.INTERNAL, message: `An error occured while inviting user: ${error}` });
     }
   }
 
@@ -103,12 +104,11 @@ export class UserService implements OnModuleInit {
     const password = data.password;
     const invitation = await this.invitationsRepository.findByToken(activationToken);
 
-    if (invitation.used) {
-      throw new RpcException('Invitation has already been used');
-    }
+    if (invitation.used) throw new RpcException({ code: status.ALREADY_EXISTS, message: 'Invitation already used' });
 
     const currentDate = new Date();
-    if (invitation.expirationDate <= currentDate) throw new RpcException('Activation token has expired');
+    if (invitation.expirationDate <= currentDate)
+      throw new RpcException({ code: status.DEADLINE_EXCEEDED, message: 'Invitation has expired' });
 
     await this.usersRepository.updatePasswordByUserId(invitation.user._id, password);
     await this.usersRepository.activateUserById(invitation.user._id);
