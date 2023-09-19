@@ -6,4 +6,7 @@ export class UserResponseDto {
 
   @ApiProperty()
   token: string;
+
+  @ApiProperty()
+  rights: boolean;
 }

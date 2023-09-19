@@ -44,14 +44,14 @@ export class UserService implements OnModuleInit {
     const user = await this.usersRepository.createUser(userModel).catch((err) => {
       throw new RpcException(err);
     });
-    return { message: 'User created successfully', token: this.jwtService.sign({ id: user._id }) };
+    return { message: 'User created successfully', token: this.jwtService.sign({ id: user._id }), rights: user.admin  };
   }
 
   async signIn(signInSignUpDto: SignInSignUpDto): Promise<UserResponseDto> {
     const user = await this.usersRepository.findByEmail(signInSignUpDto.email);
     if (user.password && !compareSync(signInSignUpDto.password, user.password))
       throw new RpcException('WRONG_PASSWORD');
-    return { message: 'User signed in successfully', token: this.jwtService.sign({ id: user._id }) };
+    return { message: 'User signed in successfully', token: this.jwtService.sign({ id: user._id }), rights: user.admin };
   }
 
   changeEmail = (newEmail: string, user: UserDocument): Promise<GetEmptyDto> =>
