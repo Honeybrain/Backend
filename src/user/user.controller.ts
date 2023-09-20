@@ -67,6 +67,7 @@ export class UserController {
     return this.userService.deleteUser(emailRequestDto);
   }
 
+  @UseGuards(GrpcAuthGuard)
   @GrpcMethod('User', 'ChangeLanguage')
   changeLanguage(data: ChangeLanguageRequestDto, meta: MetadataWithUser): Promise<GetEmptyDto> {
     return this.userService.changeLanguage(data.language, meta.user);
