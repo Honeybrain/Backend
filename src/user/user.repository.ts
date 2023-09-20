@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
 import { hashSync } from 'bcrypt';
 import { RpcException } from '@nestjs/microservices';
+import { status } from '@grpc/grpc-js';
 
 @Injectable()
 export class UserRepository {
@@ -29,9 +30,16 @@ export class UserRepository {
       .exec();
 
   findByEmail = (email: string) =>
-    this.model.findOne({ email: email }).orFail(new RpcException('USER_NOT_FOUND')).exec();
+    this.model
+      .findOne({ email: email })
+      .orFail(new RpcException({ code: status.NOT_FOUND, message: 'USER_NOT_FOUND' }))
+      .exec();
 
-  findById = (userId: string) => this.model.findById(userId).orFail(new RpcException('USER_NOT_FOUND')).exec();
+  findById = (userId: string) =>
+    this.model
+      .findById(userId)
+      .orFail(new RpcException({ code: status.NOT_FOUND, message: 'USER_NOT_FOUND' }))
+      .exec();
 
   findAllUsers = () => this.model.find().lean().exec();
 
@@ -47,19 +55,19 @@ export class UserRepository {
   updateEmailByUserId = (userId: Types.ObjectId, newEmail: string): Promise<UserDocument> =>
     this.model
       .findByIdAndUpdate(userId, { email: newEmail }, { new: true })
-      .orFail(new RpcException('USER_NOT_FOUND'))
+      .orFail(new RpcException({ code: status.NOT_FOUND, message: 'USER_NOT_FOUND' }))
       .exec();
 
   updatePasswordByUserId = (userId: Types.ObjectId, newPassword: string): Promise<UserDocument> =>
     this.model
       .findByIdAndUpdate(userId, { password: hashSync(newPassword, 10) }, { new: true })
-      .orFail(new RpcException('USER_NOT_FOUND'))
+      .orFail(new RpcException({ code: status.NOT_FOUND, message: 'USER_NOT_FOUND' }))
       .exec();
 
   activateUserById = (userId: Types.ObjectId): Promise<UserDocument> =>
     this.model
       .findByIdAndUpdate(userId, { activated: true }, { new: true })
-      .orFail(new RpcException('USER_NOT_FOUND'))
+      .orFail(new RpcException({ code: status.NOT_FOUND, message: 'USER_NOT_FOUND' }))
       .exec();
 
   updateRightByUserEmail = (email: string, admin?: boolean): Promise<UserDocument> => {
@@ -69,7 +77,7 @@ export class UserRepository {
 
     return this.model
       .findOneAndUpdate({ email }, { admin }, { new: true })
-      .orFail(new RpcException('USER_NOT_FOUND'))
+      .orFail(new RpcException({ code: status.NOT_FOUND, message: 'USER_NOT_FOUND' }))
       .exec();
   };
 
@@ -79,7 +87,10 @@ export class UserRepository {
   };
 
   updateDeleteById = (userId: Types.ObjectId) =>
-    this.model.findByIdAndDelete(userId).orFail(new RpcException('USER_NOT_FOUND')).exec();
+    this.model
+      .findByIdAndDelete(userId)
+      .orFail(new RpcException({ code: status.NOT_FOUND, message: 'USER_NOT_FOUND' }))
+      .exec();
 
   updateLanguageByUserId = (userId: Types.ObjectId, newLanguage: string): Promise<UserDocument> =>
   this.model
