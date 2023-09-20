@@ -4,6 +4,7 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { SignInSignUpDto } from './_utils/dto/request/sign-in-sign-up.dto';
 import { EmailRequestDto } from './_utils/dto/request/email-request.dto';
 import { PasswordRequestDto } from './_utils/dto/request/password-request.dto';
+import { ChangeLanguageRequestDto } from './_utils/dto/request/change-language-request.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { InviteUserRequestDto } from './_utils/dto/request/invite-user-request.dto';
 import { GetEmptyDto } from '../_utils/dto/response/get-empty.dto';
@@ -64,5 +65,11 @@ export class UserController {
   @GrpcMethod('User', 'DeleteUser')
   deleteUser(emailRequestDto: EmailRequestDto): Promise<GetEmptyDto> {
     return this.userService.deleteUser(emailRequestDto);
+  }
+
+  @UseGuards(GrpcAuthGuard)
+  @GrpcMethod('User', 'ChangeLanguage')
+  changeLanguage(data: ChangeLanguageRequestDto, meta: MetadataWithUser): Promise<GetEmptyDto> {
+    return this.userService.changeLanguage(data.language, meta.user);
   }
 }

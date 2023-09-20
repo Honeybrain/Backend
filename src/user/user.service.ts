@@ -45,6 +45,7 @@ export class UserService implements OnModuleInit {
       password: signInSignUpDto.password,
       admin: true,
       activated: true,
+      lan: "en",
     };
     const user = await this.usersRepository.createUser(userModel).catch((err) => {
       throw new RpcException({ code: Status.CANCELLED, message: err });
@@ -77,6 +78,7 @@ export class UserService implements OnModuleInit {
       password: null,
       admin: admin,
       activated: false,
+      lan: "en",
     };
 
     try {
@@ -129,7 +131,7 @@ export class UserService implements OnModuleInit {
     const users = await this.usersRepository.findAllUsers();
 
     const mappedUsers = users.map((user) =>
-      JSON.stringify({ id: user._id, email: user.email, admin: user.admin, activated: user.activated }),
+      JSON.stringify({ id: user._id, email: user.email, admin: user.admin, activated: user.activated, lan: user.lan }),
     );
 
     return { users: mappedUsers };
@@ -139,4 +141,9 @@ export class UserService implements OnModuleInit {
     this.usersRepository.updateDeleteByUserEmail(emailRequestDto.email).then(() => ({
       message: 'User deleted successfully',
     }));
+
+  changeLanguage = (newLanguage: string , user: UserDocument): Promise<GetEmptyDto> =>
+  this.usersRepository
+    .updateLanguageByUserId(user._id, newLanguage)
+    .then(() => ({ message: 'langue modifié avec succès !' }));
 }
