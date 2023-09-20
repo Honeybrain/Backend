@@ -145,5 +145,5 @@ export class UserService implements OnModuleInit {
   changeLanguage = (newLanguage: string , user: UserDocument): Promise<GetEmptyDto> =>
   this.usersRepository
     .updateLanguageByUserId(user._id, newLanguage)
-    .then(() => ({ message: 'Mot de passe modifié avec succès' }));
+    .then(() => ({ message: 'langue modifié avec succès !' }));
 }
