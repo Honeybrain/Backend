@@ -16,6 +16,9 @@ export class User {
 
   @Prop({ required: true })
   activated: boolean;
+
+  @Prop({required: true, default: "en"})
+  lan: string | "en";
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

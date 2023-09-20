@@ -41,6 +41,7 @@ export class UserRepository {
       password: user.password && hashSync(user.password, 10),
       admin: user.admin,
       activated: user.activated,
+      lan: "en",
     });
 
   updateEmailByUserId = (userId: Types.ObjectId, newEmail: string): Promise<UserDocument> =>
@@ -79,4 +80,10 @@ export class UserRepository {
 
   updateDeleteById = (userId: Types.ObjectId) =>
     this.model.findByIdAndDelete(userId).orFail(new RpcException('USER_NOT_FOUND')).exec();
+
+  updateLanguageByUserId = (userId: Types.ObjectId, newLanguage: string): Promise<UserDocument> =>
+  this.model
+    .findByIdAndUpdate(userId, {lan: newLanguage}, {new: true})
+    .orFail(new RpcException('USER_NOT_FOUND'))
+    .exec();
 }

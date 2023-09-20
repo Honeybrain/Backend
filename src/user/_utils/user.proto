@@ -50,6 +50,10 @@ message ActivateUserResponse {
   string token = 1;
 }
 
+message ChangeLanguageRequest {
+  string language = 1;
+}
+
 // The UserService defines the methods that our service exposes
 service User {
   rpc SignIn(SignInSignUpRequest) returns (UserResponse);
@@ -61,4 +65,5 @@ service User {
   rpc ChangeRights(ChangeRightsRequest) returns (EmptyResponse);
   rpc GetUsers(EmptyRequest) returns (GetUsersResponse);
   rpc DeleteUser(EmailRequest) returns (EmptyResponse);
+  rpc ChangeLanguage(ChangeLanguageRequest) returns (EmptyResponse);
 }
