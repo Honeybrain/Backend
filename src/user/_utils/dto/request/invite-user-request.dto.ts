@@ -1,9 +1,10 @@
-import { IsBoolean, IsEmail } from 'class-validator';
+import { IsEmail, IsEnum } from 'class-validator';
+import { RoleEnum } from '../../enums/role.enum';
 
 export class InviteUserRequestDto {
   @IsEmail()
   email: string;
 
-  @IsBoolean()
-  admin: boolean;
+  @IsEnum(RoleEnum, { each: true })
+  roles: RoleEnum[];
 }

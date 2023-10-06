@@ -27,14 +27,24 @@ message EmailRequest {
   string email = 1;
 }
 
+enum RoleEnum {
+  ADMIN = 0;
+  CAN_INVITE = 1;
+  CAN_MANAGE_IP = 2;
+  CAN_READ_IP = 3;
+  CAN_READ_LOGS = 4;
+  CAN_MANAGE_CONFIGURATION = 5;
+  CAN_READ_SERVICES = 6;
+}
+
 message InviteUserRequest {
   string email = 1;
-  bool admin = 2;
+  repeated RoleEnum roles = 2;
 }
 
 message ChangeRightsRequest {
   string email = 1;
-  bool admin = 2;
+  repeated RoleEnum roles = 2;
 }
 
 message GetUsersResponse {

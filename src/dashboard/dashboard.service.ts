@@ -24,10 +24,10 @@ export class DashboardService {
       subject$.next(dashboard);
     });
 
-    const containers$ = this.containersService.streamContainers().subscribe((containerReplyDto) => {
-      dashboard.containers = containerReplyDto.containers;
-      subject$.next(dashboard);
-    });
+    // const containers$ = this.containersService.streamContainers().subscribe((containerReplyDto) => {
+    //   dashboard.containers = containerReplyDto.containers;
+    //   subject$.next(dashboard);
+    // });
 
     const blacklist$ = this.blacklistService.getBlackList$(call).subscribe((blacklistReplyDto) => {
       dashboard.ips = blacklistReplyDto.ips;
@@ -36,7 +36,7 @@ export class DashboardService {
 
     call.on('cancelled', () => {
       logs$.unsubscribe();
-      containers$.unsubscribe();
+      // containers$.unsubscribe();
       blacklist$.unsubscribe();
     });
 

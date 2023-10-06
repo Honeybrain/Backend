@@ -18,7 +18,7 @@ export class GrpcAuthGuard implements CanActivate {
     const metadata = context.getArgByIndex(1);
     if (!metadata) throw new RpcException({ code: Status.UNAUTHENTICATED, message: 'UNAUTHENTICATED' });
 
-    const token = metadata.get('Authorization')[0].split(' ')[1];
+    const token = metadata.get('Authorization')[0]?.split(' ')?.[1];
     if (!token) throw new RpcException({ code: Status.UNAUTHENTICATED, message: 'UNAUTHENTICATED' });
 
     const payload: JwtPayload = await this.jwtService.verifyAsync(token).catch(() => {

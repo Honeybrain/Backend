@@ -19,6 +19,7 @@ import { EmailRequestDto } from './_utils/dto/request/email-request.dto';
 import { ActivateUserRequestDto } from './_utils/dto/request/activate-request.dto';
 import { ActivateResponseDto } from './_utils/dto/response/activate-response.dto';
 import { Status } from '@grpc/grpc-js/build/src/constants';
+import { RoleEnum } from './_utils/enums/role.enum';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -43,9 +44,9 @@ export class UserService implements OnModuleInit {
     const userModel: User = {
       email: signInSignUpDto.email,
       password: signInSignUpDto.password,
-      admin: true,
+      roles: [RoleEnum.ADMIN],
       activated: true,
-      lan: "en",
+      lan: 'en',
     };
     const user = await this.usersRepository.createUser(userModel).catch((err) => {
       throw new RpcException({ code: Status.CANCELLED, message: err });
@@ -70,15 +71,15 @@ export class UserService implements OnModuleInit {
       .updatePasswordByUserId(user._id, newPassword)
       .then(() => ({ message: 'Mot de passe modifié avec succès' }));
 
-  async inviteUser(email: string, admin: boolean) {
+  async inviteUser(email: string, roles: RoleEnum[]) {
     const activationToken = uuidv4();
 
     const userModel: User = {
       email: email,
       password: null,
-      admin: admin,
+      roles: roles,
       activated: false,
-      lan: "en",
+      lan: 'en',
     };
 
     try {
@@ -122,7 +123,7 @@ export class UserService implements OnModuleInit {
   }
 
   async changeRights(changeRightsRequestDto: ChangeRightsRequestDto) {
-    await this.usersRepository.updateRightByUserEmail(changeRightsRequestDto.email, changeRightsRequestDto.admin);
+    await this.usersRepository.updateRightByUserEmail(changeRightsRequestDto.email, changeRightsRequestDto.roles);
 
     return { message: 'User rights changed successfully' };
   }
@@ -131,7 +132,7 @@ export class UserService implements OnModuleInit {
     const users = await this.usersRepository.findAllUsers();
 
     const mappedUsers = users.map((user) =>
-      JSON.stringify({ id: user._id, email: user.email, admin: user.admin, activated: user.activated, lan: user.lan }),
+      JSON.stringify({ id: user._id, email: user.email, roles: user.roles, activated: user.activated, lan: user.lan }),
     );
 
     return { users: mappedUsers };
@@ -142,8 +143,8 @@ export class UserService implements OnModuleInit {
       message: 'User deleted successfully',
     }));
 
-  changeLanguage = (newLanguage: string , user: UserDocument): Promise<GetEmptyDto> =>
-  this.usersRepository
-    .updateLanguageByUserId(user._id, newLanguage)
-    .then(() => ({ message: 'langue modifié avec succès !' }));
+  changeLanguage = (newLanguage: string, user: UserDocument): Promise<GetEmptyDto> =>
+    this.usersRepository
+      .updateLanguageByUserId(user._id, newLanguage)
+      .then(() => ({ message: 'langue modifié avec succès !' }));
 }
