@@ -18,6 +18,7 @@ import { MailsService } from '../mails/mails.service';
 import { EmailRequestDto } from './_utils/dto/request/email-request.dto';
 import { ActivateUserRequestDto } from './_utils/dto/request/activate-request.dto';
 import { ActivateResponseDto } from './_utils/dto/response/activate-response.dto';
+import { UserLanguageResponseDto } from './_utils/dto/response/user-language-response.dto';
 import { Status } from '@grpc/grpc-js/build/src/constants';
 
 @Injectable()
@@ -146,4 +147,8 @@ export class UserService implements OnModuleInit {
   this.usersRepository
     .updateLanguageByUserId(user._id, newLanguage)
     .then(() => ({ message: 'langue modifié avec succès !' }));
+
+  async getUserLanguage(user: UserDocument): Promise<UserLanguageResponseDto> {
+    return { lan: user.lan };
+  }
 }
