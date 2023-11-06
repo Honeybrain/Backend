@@ -14,7 +14,7 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    const { user }: { user: User } = context.switchToHttp().getRequest();
+    const { user }: { user: User } = context.switchToRpc().getContext();
 
     if (!requiredRoles.length) return true;
     if (user.roles.includes(RoleEnum.ADMIN)) return true;
