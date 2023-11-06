@@ -12,7 +12,7 @@ export class User {
   @Prop({ default: null, type: String })
   password: string | null;
 
-  @Prop({ default: [], type: [{ type: String, enum: RoleEnum }] })
+  @Prop({ default: [], type: [{ type: Number, enum: RoleEnum }] })
   roles: RoleEnum[];
 
   @Prop({ required: true })

@@ -16,6 +16,7 @@ import { GetUsersListDto } from './_utils/dto/response/get-users-list.dto';
 import { ActivateResponseDto } from './_utils/dto/response/activate-response.dto';
 import { Protect } from '../_utils/decorators/protect.decorator';
 import { RoleEnum } from './_utils/enums/role.enum';
+import { GetUserDto } from './_utils/dto/response/get-user.dto';
 
 @Controller('user')
 @ApiTags('User')
@@ -46,7 +47,7 @@ export class UserController {
 
   @Protect(RoleEnum.CAN_INVITE)
   @GrpcMethod('User', 'InviteUser')
-  inviteUser(data: InviteUserRequestDto): Promise<GetEmptyDto> {
+  inviteUser(data: InviteUserRequestDto): Promise<GetUserDto> {
     return this.userService.inviteUser(data.email, data.roles);
   }
 
@@ -55,9 +56,9 @@ export class UserController {
     return this.userService.activateUser(data);
   }
 
-  @Protect(RoleEnum.ADMIN)
+  @Protect()
   @GrpcMethod('User', 'ChangeRights')
-  changeRights(data: ChangeRightsRequestDto): Promise<GetEmptyDto> {
+  changeRights(data: ChangeRightsRequestDto): Promise<GetUserDto> {
     return this.userService.changeRights(data);
   }
 

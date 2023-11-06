@@ -20,6 +20,7 @@ import { ActivateUserRequestDto } from './_utils/dto/request/activate-request.dt
 import { ActivateResponseDto } from './_utils/dto/response/activate-response.dto';
 import { Status } from '@grpc/grpc-js/build/src/constants';
 import { RoleEnum } from './_utils/enums/role.enum';
+import { UserMapper } from './user.mapper';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -29,6 +30,7 @@ export class UserService implements OnModuleInit {
     private readonly usersRepository: UserRepository,
     private readonly invitationsRepository: InvitationRepository,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
+    private readonly userMapper: UserMapper,
   ) {}
 
   onModuleInit() {
@@ -90,7 +92,7 @@ export class UserService implements OnModuleInit {
       const activationLink = `http://localhost:3000/activate/${activationToken}`;
       await this.mailsService.sendActivationMail(email, activationLink);
 
-      return { message: 'User invited successfully. Activation email sent.' };
+      return this.userMapper.toGetUser(user);
     } catch (error) {
       if (error.code === 11000 && error.message.includes('email')) {
         throw new RpcException({
@@ -118,25 +120,16 @@ export class UserService implements OnModuleInit {
     await this.invitationsRepository.markUsed(activationToken);
     const user = await this.usersRepository.findById(invitation.user._id.toString());
     const token = await this.signIn({ email: user.email, password: password });
-    console.log(token);
     return { token: token.token };
   }
 
-  async changeRights(changeRightsRequestDto: ChangeRightsRequestDto) {
-    await this.usersRepository.updateRightByUserEmail(changeRightsRequestDto.email, changeRightsRequestDto.roles);
+  changeRights = (changeRightsRequestDto: ChangeRightsRequestDto) =>
+    this.usersRepository
+      .updateRightByUserEmail(changeRightsRequestDto.email, changeRightsRequestDto.roles)
+      .then((x) => this.userMapper.toGetUser(x));
 
-    return { message: 'User rights changed successfully' };
-  }
-
-  async findAllUsers(): Promise<GetUsersListDto> {
-    const users = await this.usersRepository.findAllUsers();
-
-    const mappedUsers = users.map((user) =>
-      JSON.stringify({ id: user._id, email: user.email, roles: user.roles, activated: user.activated, lan: user.lan }),
-    );
-
-    return { users: mappedUsers };
-  }
+  findAllUsers = (): Promise<GetUsersListDto> =>
+    this.usersRepository.findAllUsers().then((x) => this.userMapper.toGetUsers(x));
 
   deleteUser = (emailRequestDto: EmailRequestDto) =>
     this.usersRepository.updateDeleteByUserEmail(emailRequestDto.email).then(() => ({
