@@ -19,6 +19,9 @@ export class User {
 
   @Prop({required: true, default: "en"})
   lan: string | "en";
+
+  @Prop({required: true, default: "false"})
+  nightMode: boolean | false;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

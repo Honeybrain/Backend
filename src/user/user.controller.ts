@@ -16,6 +16,7 @@ import { GetUsersListDto } from './_utils/dto/response/get-users-list.dto';
 import { ActivateResponseDto } from './_utils/dto/response/activate-response.dto';
 import { UserRequestDto } from './_utils/dto/request/user-request.dto';
 import { UserLanguageResponseDto } from './_utils/dto/response/user-language-response.dto';
+import { UserNightModeResponseDto } from './_utils/dto/response/user-nightmode-response.dto';
 
 @Controller('user')
 @ApiTags('User')
@@ -78,5 +79,11 @@ export class UserController {
   @GrpcMethod('User', 'getUserLanguage')
   getUserLanguage(data: UserRequestDto, meta: MetadataWithUser): Promise<UserLanguageResponseDto> {
     return this.userService.getUserLanguage(meta.user);
+  }
+
+  @UseGuards(GrpcAuthGuard)
+  @GrpcMethod('User', 'getUserNightMode')
+  getUserNightMode(data: UserRequestDto, meta: MetadataWithUser): Promise<UserNightModeResponseDto> {
+    return this.userService.getUserNightMode(meta.user);
   }
 }

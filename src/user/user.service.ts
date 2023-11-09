@@ -19,6 +19,7 @@ import { EmailRequestDto } from './_utils/dto/request/email-request.dto';
 import { ActivateUserRequestDto } from './_utils/dto/request/activate-request.dto';
 import { ActivateResponseDto } from './_utils/dto/response/activate-response.dto';
 import { UserLanguageResponseDto } from './_utils/dto/response/user-language-response.dto';
+import { UserNightModeResponseDto } from './_utils/dto/response/user-nightmode-response.dto';
 import { Status } from '@grpc/grpc-js/build/src/constants';
 
 @Injectable()
@@ -47,6 +48,7 @@ export class UserService implements OnModuleInit {
       admin: true,
       activated: true,
       lan: "en",
+      nightMode: false,
     };
     const user = await this.usersRepository.createUser(userModel).catch((err) => {
       throw new RpcException({ code: Status.CANCELLED, message: err });
@@ -80,6 +82,7 @@ export class UserService implements OnModuleInit {
       admin: admin,
       activated: false,
       lan: "en",
+      nightMode: false,
     };
 
     try {
@@ -132,7 +135,7 @@ export class UserService implements OnModuleInit {
     const users = await this.usersRepository.findAllUsers();
 
     const mappedUsers = users.map((user) =>
-      JSON.stringify({ id: user._id, email: user.email, admin: user.admin, activated: user.activated, lan: user.lan }),
+      JSON.stringify({ id: user._id, email: user.email, admin: user.admin, activated: user.activated, lan: user.lan, nightMode: user.nightMode }),
     );
 
     return { users: mappedUsers };
@@ -150,5 +153,9 @@ export class UserService implements OnModuleInit {
 
   async getUserLanguage(user: UserDocument): Promise<UserLanguageResponseDto> {
     return { lan: user.lan };
+  }
+
+  async getUserNightMode(user: UserDocument): Promise<UserNightModeResponseDto> {
+    return {nightMode: user.nightMode}
   }
 }
