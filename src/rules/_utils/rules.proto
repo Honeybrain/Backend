@@ -9,6 +9,7 @@ service Rules {
 
 message PutNewRulesRequest {
     string rules = 1;
+    string filters = 2;
 }
 
 message PutNewRulesReply {
@@ -19,4 +20,5 @@ message GetRulesRequest {
 
 message GetRulesReply {
   string rules = 1;
+  string filters = 2;
 }

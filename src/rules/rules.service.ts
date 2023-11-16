@@ -15,18 +15,17 @@ export class RulesService {
   async getRules(): Promise<GetRulesDto> {
     try {
       const rules = await readFile('/app/honeypot/suricata.rules', 'utf-8');
-      return { rules };
+      const filters = await readFile('/app/honeypot/nginx-honeypot.conf', 'utf-8');
+      return { rules, filters };
     } catch (error) {
       console.error('Error reading rules file:', error);
       throw error;
     }
   }
 
-  private async restartSuricataContainer(): Promise<void> {
-    const containerNameOrId = 'suricata';
-
+  private async restartContainer(name: string): Promise<void> {
     try {
-      const container = this.docker.getContainer(containerNameOrId);
+      const container = this.docker.getContainer(name);
       await container.restart();
       console.log('Suricata container restarted successfully');
     } catch (error) {
@@ -39,9 +38,14 @@ export class RulesService {
     if (!setRulesDto.rules) {
       throw new RpcException('Rules are required');
     }
+    if (!setRulesDto.filters) {
+      throw new RpcException('Filters are required');
+    }
     try {
       await writeFile('/app/honeypot/suricata.rules', setRulesDto.rules, 'utf-8');
-      await this.restartSuricataContainer();
+      await this.restartContainer("suricata");
+      await writeFile('/app/honeypot/nginx-honeypot.conf', setRulesDto.filters, 'utf-8');
+      await this.restartContainer("fail2ban");
     } catch (error) {
       console.error('Error writing rules to file:', error);
       throw error;
