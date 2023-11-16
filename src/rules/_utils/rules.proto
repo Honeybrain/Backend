@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package rules;
+
+service Rules {
+  rpc PutNewDetectionRules (PutNewRulesRequest) returns (PutNewRulesReply) {}
+  rpc GetDetectionRules (GetRulesRequest) returns (GetRulesReply) {}
+}
+
+message PutNewRulesRequest {
+    string rules = 1;
+}
+
+message PutNewRulesReply {
+}
+
+message GetRulesRequest {
+}
+
+message GetRulesReply {
+  string rules = 1;
+}
