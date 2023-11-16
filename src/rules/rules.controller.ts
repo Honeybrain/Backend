@@ -5,6 +5,7 @@ import { ServerUnaryCall } from '@grpc/grpc-js';
 import { GetRulesDto } from './_utils/dto/response/get-rules.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { SetRulesDto } from './_utils/dto/request/set-rules.dto';
+import { SetFiltersDto } from './_utils/dto/request/set-filters.dto';
 
 @Controller('rules')
 @ApiTags('Rules')
@@ -26,8 +27,17 @@ export class RulesController {
     try {
       await this.rulesService.PutNewRules(setRulesDto);
     } catch (error) {
-      // Handle any errors that might occur
       console.error('Error in PutNewDetectionRules:', error);
+      throw error;
+    }
+  }
+
+  @GrpcMethod('Rules', 'PutNewDetectionFilters')
+  async PutNewDetectionFilters(setFiltersDto: SetFiltersDto): Promise<void> {
+    try {
+      await this.rulesService.PutNewFilters(setFiltersDto);
+    } catch (error) {
+      console.error('Error in PutNewDetectionFilters:', error);
       throw error;
     }
   }

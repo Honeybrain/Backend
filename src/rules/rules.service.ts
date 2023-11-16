@@ -7,6 +7,7 @@ import { SetRulesDto } from './_utils/dto/request/set-rules.dto';
 import * as Docker from 'dockerode';
 import { RpcException } from '@nestjs/microservices';
 import { readFile, writeFile } from 'fs/promises';
+import { SetFiltersDto } from './_utils/dto/request/set-filters.dto';
 
 @Injectable()
 export class RulesService {
@@ -38,13 +39,21 @@ export class RulesService {
     if (!setRulesDto.rules) {
       throw new RpcException('Rules are required');
     }
-    if (!setRulesDto.filters) {
-      throw new RpcException('Filters are required');
-    }
     try {
       await writeFile('/app/honeypot/suricata.rules', setRulesDto.rules, 'utf-8');
       await this.restartContainer("suricata");
-      await writeFile('/app/honeypot/nginx-honeypot.conf', setRulesDto.filters, 'utf-8');
+    } catch (error) {
+      console.error('Error writing rules to file:', error);
+      throw error;
+    }
+  }
+
+  async PutNewFilters(setFiltersDto: SetFiltersDto): Promise<void> {
+    if (!setFiltersDto.filters) {
+      throw new RpcException('Filters are required');
+    }
+    try {
+      await writeFile('/app/honeypot/nginx-honeypot.conf', setFiltersDto.filters, 'utf-8');
       await this.restartContainer("fail2ban");
     } catch (error) {
       console.error('Error writing rules to file:', error);

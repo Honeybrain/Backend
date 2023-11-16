@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class SetRulesDto {
+export class SetFiltersDto {
   @IsString()
-  rules: string;
+  filters: string;
 }
