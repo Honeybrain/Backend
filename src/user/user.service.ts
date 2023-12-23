@@ -21,6 +21,7 @@ import { ActivateResponseDto } from './_utils/dto/response/activate-response.dto
 import { Status } from '@grpc/grpc-js/build/src/constants';
 import { RoleEnum } from './_utils/enums/role.enum';
 import { UserMapper } from './user.mapper';
+import { GetUserDto } from './_utils/dto/response/get-user.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -53,14 +54,24 @@ export class UserService implements OnModuleInit {
     const user = await this.usersRepository.createUser(userModel).catch((err) => {
       throw new RpcException({ code: Status.CANCELLED, message: err });
     });
-    return { message: 'User created successfully', token: this.jwtService.sign({ id: user._id }) };
+    return {
+      message: 'User created successfully',
+      token: this.jwtService.sign({ id: user._id }),
+      user: this.userMapper.toGetUser(user),
+    };
   }
+
+  getMe = (user: UserDocument): GetUserDto => this.userMapper.toGetUser(user);
 
   async signIn(signInSignUpDto: SignInSignUpDto): Promise<UserResponseDto> {
     const user = await this.usersRepository.findByEmail(signInSignUpDto.email);
     if (user.password && !compareSync(signInSignUpDto.password, user.password))
       throw new RpcException({ code: status.UNAUTHENTICATED, message: 'Wrong password' });
-    return { message: 'User signed in successfully', token: this.jwtService.sign({ id: user._id }) };
+    return {
+      message: 'User signed in successfully',
+      token: this.jwtService.sign({ id: user._id }),
+      user: this.userMapper.toGetUser(user),
+    };
   }
 
   changeEmail = (newEmail: string, user: UserDocument): Promise<GetEmptyDto> =>

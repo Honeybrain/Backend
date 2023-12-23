@@ -33,13 +33,19 @@ export class UserController {
     return this.userService.signIn(signInSignUpDto);
   }
 
-  @UseGuards(GrpcAuthGuard)
+  @Protect()
+  @GrpcMethod('User', 'GetMe')
+  getMe(_: unknown, meta: MetadataWithUser) {
+    return this.userService.getMe(meta.user);
+  }
+
+  @Protect()
   @GrpcMethod('User', 'ChangeEmail')
   changeEmail(data: EmailRequestDto, meta: MetadataWithUser): Promise<GetEmptyDto> {
     return this.userService.changeEmail(data.email, meta.user);
   }
 
-  @UseGuards(GrpcAuthGuard)
+  @Protect()
   @GrpcMethod('User', 'ResetPassword')
   resetPassword(data: PasswordRequestDto, meta: MetadataWithUser): Promise<GetEmptyDto> {
     return this.userService.resetPassword(data.password, meta.user);
