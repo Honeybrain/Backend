@@ -119,4 +119,8 @@ export class BlacklistService {
 
     await execIpTables.start({});
   }
+
+  async blockCountry(countryCode: string) {
+    return ("received country code to block: " + countryCode);
+  }
 }

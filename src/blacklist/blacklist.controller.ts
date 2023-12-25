@@ -25,4 +25,9 @@ export class BlacklistController {
   PutWhiteList(setIdDto: SetIpDto) {
     return this.blacklistService.putWhiteList(setIdDto);
   }
+
+  @GrpcMethod('Blacklist', 'blockCountry')
+  BlockCountry(countryCode: string) {
+    return this.blacklistService.blockCountry(countryCode);
+  }
 }

@@ -6,6 +6,7 @@ service Blacklist {
   rpc PutBlackList (PutBlackListRequest) returns (PutBlackListReply) {}
   rpc GetBlackList (GetBlackListRequest) returns (stream GetBlackListReply) {}
   rpc PutWhiteList (PutWhiteListRequest) returns (PutWhiteListReply) {}
+  rpc blockCountry (BlockCountryRequest) returns (BlockCountryReply) {}
 }
 
 message PutBlackListRequest {
@@ -26,4 +27,11 @@ message PutWhiteListRequest {
 }
 
 message PutWhiteListReply {
+}
+
+message BlockCountryRequest {
+  string countryCode = 1;
+}
+
+message BlockCountryReply {
 }
