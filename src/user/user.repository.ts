@@ -20,6 +20,7 @@ export class UserRepository {
             password: hashSync(password, 10),
             admin: true,
             activated: true,
+            roles: [RoleEnum.ADMIN],
           },
         },
         {
