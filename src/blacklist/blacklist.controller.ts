@@ -5,6 +5,7 @@ import { ServerUnaryCall } from '@grpc/grpc-js';
 import { GetIdsDto } from './_utils/dto/response/get-ids.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { SetIpDto } from './_utils/dto/request/set-ip.dto';
+import { BlockCountryRequestDto } from './_utils/dto/request/block-country-request.dto';
 
 @Controller('blacklist')
 @ApiTags('Blacklist')
@@ -19,6 +20,11 @@ export class BlacklistController {
   @GrpcMethod('Blacklist', 'PutBlackList')
   PutBlackList(setIdDto: SetIpDto) {
     return this.blacklistService.putBlackList(setIdDto);
+  }
+
+  @GrpcMethod('Blacklist', 'BlockCountry')
+  BlockCountry(blockCountryRequestDto: BlockCountryRequestDto) {
+    return this.blacklistService.blockCountry(blockCountryRequestDto.countryCode);
   }
 
   @GrpcMethod('Blacklist', 'PutWhiteList')

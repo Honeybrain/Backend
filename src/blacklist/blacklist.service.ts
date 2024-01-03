@@ -77,6 +77,43 @@ export class BlacklistService {
       throw new RpcException(`FFailed to start execution iptables: ${err}`);
     });
   }
+  
+  private async restartContainer(name: string): Promise<void> {
+    try {
+      const container = this.docker.getContainer(name);
+      await container.restart();
+      console.log('Fail2Ban container restarted successfully');
+    } catch (error) {
+      console.error('Error restarting Fail2Ban container:', error);
+      throw error;
+    }
+  }
+
+  async blockCountry(countryCode: string) {
+    if (!countryCode) throw new RpcException('countryCode is required');
+    const filePath = "/app/honeypot/geohostsdeny.conf";
+
+    try {
+      const blockConf = await readFile(filePath, 'utf8');
+      
+      const lines = blockConf.split('\n');
+      const countryListIndex = lines.findIndex(line => line.trim().startsWith('country_list ='));
+      if (countryListIndex !== -1) {
+        const countryListParts = lines[countryListIndex].split('=');
+        const existingCountries = countryListParts[1].trim().split("|").filter(Boolean);
+        if (!existingCountries.includes(countryCode)) {
+          existingCountries.push(countryCode);
+        }
+        lines[countryListIndex] = `country_list = ${existingCountries.join("|")}`;
+      }
+
+      await writeFile(filePath, lines.join('\n'), 'utf8');
+      await this.restartContainer("suricata");
+
+    } catch (err) {
+      throw new RpcException(`Error while updating the file: ${err}`);
+    }
+  }
 
   async putWhiteList(setIdDto: SetIpDto) {
     if (!setIdDto.ip) throw new RpcException('IP address is required');
