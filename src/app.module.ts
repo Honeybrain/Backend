@@ -11,6 +11,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GlobalModule } from './_utils/global.module';
 import { MailsModule } from './mails/mails.module';
 import { RulesModule } from './rules/rules.module';
+import { MobileModule } from './mobile/mobile.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { RulesModule } from './rules/rules.module';
     ContainersModule,
     BlacklistModule,
     UserModule,
-    RulesModule
+    RulesModule,
+    MobileModule
   ],
 })
 export class AppModule {}

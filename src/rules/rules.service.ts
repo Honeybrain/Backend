@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { watch } from 'chokidar';
-import { ServerUnaryCall } from '@grpc/grpc-js';
 import { GetRulesDto } from './_utils/dto/response/get-rules.dto';
-import { Subject } from 'rxjs';
 import { SetRulesDto } from './_utils/dto/request/set-rules.dto';
 import * as Docker from 'dockerode';
 import { RpcException } from '@nestjs/microservices';

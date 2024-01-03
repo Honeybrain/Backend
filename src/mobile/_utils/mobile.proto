@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package mobile;
+
+message WireguardConfigRequest {
+}
+
+message WireguardConfigResponse {
+  string base64Image = 1;
+}
+
+service Mobile {
+  rpc GetWireguardConfig(WireguardConfigRequest) returns (WireguardConfigResponse);
+}
