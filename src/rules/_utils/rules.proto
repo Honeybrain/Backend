@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package rules;
+
+service Rules {
+  rpc PutNewDetectionRules (PutNewRulesRequest) returns (PutNewRulesReply) {}
+  rpc PutNewDetectionFilters (PutNewFiltersRequest) returns (PutNewFiltersReply) {}
+  rpc GetDetectionRules (GetRulesRequest) returns (GetRulesReply) {}
+}
+
+message PutNewRulesRequest {
+    string rules = 1;
+}
+
+message PutNewRulesReply {
+}
+
+message PutNewFiltersRequest {
+    string filters = 1;
+}
+
+message PutNewFiltersReply {
+}
+
+message GetRulesRequest {
+}
+
+message GetRulesReply {
+  string rules = 1;
+  string filters = 2;
+}

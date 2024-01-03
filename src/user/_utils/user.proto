@@ -74,6 +74,12 @@ message ChangeLanguageRequest {
   string language = 1;
 }
 
+message UserLanguageResponse {
+  string lan = 1;
+}
+
+message UserRequest {}
+
 // The UserService defines the methods that our service exposes
 service User {
   rpc SignIn(SignInSignUpRequest) returns (UserResponse);
@@ -87,4 +93,5 @@ service User {
   rpc GetUsers(EmptyRequest) returns (GetUsersResponse);
   rpc DeleteUser(EmailRequest) returns (EmptyResponse);
   rpc ChangeLanguage(ChangeLanguageRequest) returns (EmptyResponse);
+  rpc GetUserLanguage(UserRequest) returns (UserLanguageResponse);
 }

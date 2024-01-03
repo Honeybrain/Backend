@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GlobalModule } from './_utils/global.module';
 import { MailsModule } from './mails/mails.module';
+import { RulesModule } from './rules/rules.module';
 
 @Module({
   imports: [
@@ -23,13 +24,13 @@ import { MailsModule } from './mails/mails.module';
       }),
     }),
     ConfigModule.forRoot({ validate: validateEnv, isGlobal: true }),
-    HelloworldModule,
     MailsModule,
     LogsModule,
     DashboardModule,
     ContainersModule,
     BlacklistModule,
     UserModule,
+    RulesModule
   ],
 })
 export class AppModule {}

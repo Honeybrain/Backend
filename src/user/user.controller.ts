@@ -17,6 +17,8 @@ import { ActivateResponseDto } from './_utils/dto/response/activate-response.dto
 import { Protect } from '../_utils/decorators/protect.decorator';
 import { RoleEnum } from './_utils/enums/role.enum';
 import { GetUserDto } from './_utils/dto/response/get-user.dto';
+import { UserRequestDto } from './_utils/dto/request/user-request.dto';
+import { UserLanguageResponseDto } from './_utils/dto/response/user-language-response.dto';
 
 @Controller('user')
 @ApiTags('User')
@@ -83,5 +85,10 @@ export class UserController {
   @GrpcMethod('User', 'ChangeLanguage')
   changeLanguage(data: ChangeLanguageRequestDto, meta: MetadataWithUser): Promise<GetEmptyDto> {
     return this.userService.changeLanguage(data.language, meta.user);
+  }
+  @UseGuards(GrpcAuthGuard)
+  @GrpcMethod('User', 'getUserLanguage')
+  getUserLanguage(data: UserRequestDto, meta: MetadataWithUser): Promise<UserLanguageResponseDto> {
+    return this.userService.getUserLanguage(meta.user);
   }
 }
