@@ -78,6 +78,24 @@ export class BlacklistService {
     });
   }
 
+  async blockCountry(countryCode: string) {
+    if (!countryCode) throw new RpcException('IP address is required');
+
+    // Define the command
+    const cmd = `fail2ban-client set geohostsdeny-honeypot banip ${countryCode}`;
+
+    const execNginx = await this.docker
+      .getContainer('fail2ban')
+      .exec({ Cmd: cmd.split(' '), AttachStdout: true, AttachStderr: true })
+      .catch((err) => {
+        throw new RpcException(`Failed to execute geohostsdeny-honeypot banip: ${err}`);
+      });
+
+    await execNginx.start({}).catch((err) => {
+      throw new RpcException(`Failed to start execution nginx: ${err}`);
+    });
+  }
+
   async putWhiteList(setIdDto: SetIpDto) {
     if (!setIdDto.ip) throw new RpcException('IP address is required');
 
