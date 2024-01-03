@@ -77,23 +77,42 @@ export class BlacklistService {
       throw new RpcException(`FFailed to start execution iptables: ${err}`);
     });
   }
+  
+  private async restartContainer(name: string): Promise<void> {
+    try {
+      const container = this.docker.getContainer(name);
+      await container.restart();
+      console.log('Fail2Ban container restarted successfully');
+    } catch (error) {
+      console.error('Error restarting Fail2Ban container:', error);
+      throw error;
+    }
+  }
 
   async blockCountry(countryCode: string) {
-    if (!countryCode) throw new RpcException('IP address is required');
+    if (!countryCode) throw new RpcException('countryCode is required');
+    const filePath = "/app/honeypot/geohostsdeny.conf";
 
-    // Define the command
-    const cmd = `fail2ban-client set geohostsdeny-honeypot banip ${countryCode}`;
+    try {
+      const blockConf = await readFile(filePath, 'utf8');
+      
+      const lines = blockConf.split('\n');
+      const countryListIndex = lines.findIndex(line => line.trim().startsWith('country_list ='));
+      if (countryListIndex !== -1) {
+        const countryListParts = lines[countryListIndex].split('=');
+        const existingCountries = countryListParts[1].trim().split("|").filter(Boolean);
+        if (!existingCountries.includes(countryCode)) {
+          existingCountries.push(countryCode);
+        }
+        lines[countryListIndex] = `country_list = ${existingCountries.join("|")}`;
+      }
 
-    const execNginx = await this.docker
-      .getContainer('fail2ban')
-      .exec({ Cmd: cmd.split(' '), AttachStdout: true, AttachStderr: true })
-      .catch((err) => {
-        throw new RpcException(`Failed to execute geohostsdeny-honeypot banip: ${err}`);
-      });
+      await writeFile(filePath, lines.join('\n'), 'utf8');
+      await this.restartContainer("suricata");
 
-    await execNginx.start({}).catch((err) => {
-      throw new RpcException(`Failed to start execution nginx: ${err}`);
-    });
+    } catch (err) {
+      throw new RpcException(`Error while updating the file: ${err}`);
+    }
   }
 
   async putWhiteList(setIdDto: SetIpDto) {
