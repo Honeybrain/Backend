@@ -11,6 +11,7 @@ message SignInSignUpRequest {
 message UserResponse {
   string message = 1;
   string token = 2;
+  UserDto user = 3;
 }
 
 message EmptyRequest {}
@@ -27,18 +28,36 @@ message EmailRequest {
   string email = 1;
 }
 
+enum RoleEnum {
+  ADMIN = 0;
+  CAN_INVITE = 1;
+  CAN_MANAGE_IP = 2;
+  CAN_READ_IP = 3;
+  CAN_READ_LOGS = 4;
+  CAN_MANAGE_CONFIGURATION = 5;
+  CAN_READ_SERVICES = 6;
+}
+
 message InviteUserRequest {
   string email = 1;
-  bool admin = 2;
+  repeated RoleEnum roles = 2;
 }
 
 message ChangeRightsRequest {
   string email = 1;
-  bool admin = 2;
+  repeated RoleEnum roles = 2;
+}
+
+message UserDto {
+  string id = 1;
+  string email = 2;
+  repeated RoleEnum roles = 3;
+  bool activated = 4;
+  string language = 5;
 }
 
 message GetUsersResponse {
-  repeated string users = 1;
+  repeated UserDto users = 1;
 }
 
 message ActivateUserRequest {
@@ -48,6 +67,7 @@ message ActivateUserRequest {
 
 message ActivateUserResponse {
   string token = 1;
+  UserDto user = 2;
 }
 
 message ChangeLanguageRequest {
@@ -64,11 +84,12 @@ message UserRequest {}
 service User {
   rpc SignIn(SignInSignUpRequest) returns (UserResponse);
   rpc SignUp(SignInSignUpRequest) returns (UserResponse);
+  rpc GetMe(EmptyRequest) returns (UserDto);
   rpc ResetPassword(PasswordRequest) returns (EmptyResponse);
   rpc ChangeEmail(EmailRequest) returns (EmptyResponse);
-  rpc InviteUser(InviteUserRequest) returns (EmptyResponse);
+  rpc InviteUser(InviteUserRequest) returns (UserDto);
   rpc ActivateUser(ActivateUserRequest) returns (ActivateUserResponse);
-  rpc ChangeRights(ChangeRightsRequest) returns (EmptyResponse);
+  rpc ChangeRights(ChangeRightsRequest) returns (UserDto);
   rpc GetUsers(EmptyRequest) returns (GetUsersResponse);
   rpc DeleteUser(EmailRequest) returns (EmptyResponse);
   rpc ChangeLanguage(ChangeLanguageRequest) returns (EmptyResponse);

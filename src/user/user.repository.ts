@@ -5,6 +5,7 @@ import { User, UserDocument } from './user.schema';
 import { hashSync } from 'bcrypt';
 import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
+import { RoleEnum } from './_utils/enums/role.enum';
 
 @Injectable()
 export class UserRepository {
@@ -47,9 +48,9 @@ export class UserRepository {
     this.model.create({
       email: user.email,
       password: user.password && hashSync(user.password, 10),
-      admin: user.admin,
+      roles: user.roles,
       activated: user.activated,
-      lan: "en",
+      lan: 'en',
     });
 
   updateEmailByUserId = (userId: Types.ObjectId, newEmail: string): Promise<UserDocument> =>
@@ -70,16 +71,11 @@ export class UserRepository {
       .orFail(new RpcException({ code: status.NOT_FOUND, message: 'USER_NOT_FOUND' }))
       .exec();
 
-  updateRightByUserEmail = (email: string, admin?: boolean): Promise<UserDocument> => {
-    if (admin === undefined) {
-      admin = false;
-    }
-
-    return this.model
-      .findOneAndUpdate({ email }, { admin }, { new: true })
+  updateRightByUserEmail = (email: string, roles: RoleEnum[]): Promise<UserDocument> =>
+    this.model
+      .findOneAndUpdate({ email }, { roles }, { new: true })
       .orFail(new RpcException({ code: status.NOT_FOUND, message: 'USER_NOT_FOUND' }))
       .exec();
-  };
 
   updateDeleteByUserEmail = async (email: string) => {
     const user = await this.findByEmail(email);

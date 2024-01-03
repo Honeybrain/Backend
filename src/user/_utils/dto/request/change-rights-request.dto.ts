@@ -1,9 +1,10 @@
-import { IsBoolean, IsString } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
+import { RoleEnum } from '../../enums/role.enum';
 
 export class ChangeRightsRequestDto {
   @IsString()
   email: string;
 
-  @IsBoolean()
-  admin: boolean;
+  @IsEnum(RoleEnum, { each: true })
+  roles: RoleEnum[];
 }

@@ -1,7 +1,5 @@
-import { IsArray, IsString } from 'class-validator';
+import { GetUserDto } from './get-user.dto';
 
 export class GetUsersListDto {
-  @IsArray()
-  @IsString({ each: true })
-  users: string[];
+  users: GetUserDto[];
 }
