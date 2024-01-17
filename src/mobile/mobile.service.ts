@@ -7,7 +7,7 @@ import { readFile, writeFile } from 'fs/promises';
 export class MobileService {
   async getWireguardConfig(wireguardConfigRequestDto: WireguardConfigRequestDto): Promise<WireguardConfigResponseDto> {
     try {
-      const pngBuffer = await readFile('/app/honeypot/peer1.png');
+      const pngBuffer = await readFile('/app/honeypot/peer1/peer1.png');
       const base64Image = pngBuffer.toString('base64');
       return { base64Image: base64Image };
     } catch (error) {
