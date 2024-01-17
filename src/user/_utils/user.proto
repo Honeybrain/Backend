@@ -54,6 +54,7 @@ message UserDto {
   repeated RoleEnum roles = 3;
   bool activated = 4;
   string language = 5;
+  bool nightMode = 6;
 }
 
 message GetUsersResponse {
@@ -78,6 +79,30 @@ message UserLanguageResponse {
   string lan = 1;
 }
 
+message HistoryEntryResponse {
+  string id = 1; // ID de l'entrée d'historique créée
+  string status = 2; // Par exemple, "success" ou "error"
+}
+
+message GetHistoryRequest {
+}
+
+message GetHistoryResponse {
+  repeated HistoryEntry entries = 1;
+}
+
+message HistoryEntry {
+  string id = 1;
+  string date = 2;
+  string actionType = 3;
+  string userId = 4;
+  string description = 5;
+}
+
+message NightModeRequest {
+  bool nightMode = 1;
+}
+
 message UserRequest {}
 
 // The UserService defines the methods that our service exposes
@@ -94,4 +119,6 @@ service User {
   rpc DeleteUser(EmailRequest) returns (EmptyResponse);
   rpc ChangeLanguage(ChangeLanguageRequest) returns (EmptyResponse);
   rpc GetUserLanguage(UserRequest) returns (UserLanguageResponse);
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+  rpc NightMode(NightModeRequest) returns (EmptyResponse);
 }
