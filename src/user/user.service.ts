@@ -55,6 +55,7 @@ export class UserService implements OnModuleInit {
       roles: [RoleEnum.ADMIN],
       activated: true,
       lan: 'en',
+      nightMode: false
     };
     const user = await this.usersRepository.createUser(userModel).catch((err) => {
       throw new RpcException({ code: Status.CANCELLED, message: err });
@@ -98,6 +99,7 @@ export class UserService implements OnModuleInit {
       roles: roles,
       activated: false,
       lan: 'en',
+      nightMode: false
     };
 
     try {
