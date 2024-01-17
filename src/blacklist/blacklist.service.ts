@@ -7,10 +7,19 @@ import { SetIpDto } from './_utils/dto/request/set-ip.dto';
 import * as Docker from 'dockerode';
 import { RpcException } from '@nestjs/microservices';
 import { readFile, writeFile } from 'fs/promises';
+import { HistoryRepository } from '../history/history.repository';
+
 
 @Injectable()
 export class BlacklistService {
+
+  constructor(
+    private historyRepository: HistoryRepository,
+    // ... autres dépendances ...
+  ) {}
+  
   private docker = new Docker();
+  private previousBlockedIps: string[] = [];
 
   private async processFileChange(path: string, subject: Subject<GetIdsDto>) {
     readFile(path, 'utf8')
@@ -27,8 +36,19 @@ export class BlacklistService {
           .filter((ip) => ip !== null) as string[];
 
         subject.next({ ips });
+
+        const newBlockedIps = ips.filter(ip => !this.previousBlockedIps.includes(ip));
+        newBlockedIps.forEach(async (ip) => {
+          await this.historyRepository.createHistoryEntry({
+            date: new Date(),
+            actionType: 'attack',
+            description: `Attaque détectée avec blocage de l'IP ${ip}`,
+          });
+        });
+        this.previousBlockedIps = ips;
       })
       .catch((err) => {
+        console.error(`Error reading block.conf: ${err}`);
         throw new RpcException(`Error reading file: ${err}`);
       });
   }

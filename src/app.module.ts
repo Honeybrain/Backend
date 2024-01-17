@@ -12,6 +12,7 @@ import { GlobalModule } from './_utils/global.module';
 import { MailsModule } from './mails/mails.module';
 import { RulesModule } from './rules/rules.module';
 import { MobileModule } from './mobile/mobile.module';
+import { HistoryModule } from './history/history.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { MobileModule } from './mobile/mobile.module';
     BlacklistModule,
     UserModule,
     RulesModule,
-    MobileModule
+    MobileModule,
+    HistoryModule,
   ],
 })
 export class AppModule {}

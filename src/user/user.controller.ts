@@ -19,6 +19,9 @@ import { RoleEnum } from './_utils/enums/role.enum';
 import { GetUserDto } from './_utils/dto/response/get-user.dto';
 import { UserRequestDto } from './_utils/dto/request/user-request.dto';
 import { UserLanguageResponseDto } from './_utils/dto/response/user-language-response.dto';
+import { GetHistoryRequestDto } from './_utils/dto/request/get-history-request.dto';
+import { GetHistoryResponseDto } from './_utils/dto/response/get-history-response.dto';
+import { NightModeRequestDto } from './_utils/dto/request/change-night-mode-request.dto'
 
 @Controller('user')
 @ApiTags('User')
@@ -90,5 +93,17 @@ export class UserController {
   @GrpcMethod('User', 'getUserLanguage')
   getUserLanguage(data: UserRequestDto, meta: MetadataWithUser): Promise<UserLanguageResponseDto> {
     return this.userService.getUserLanguage(meta.user);
+  }
+
+  //history
+  @GrpcMethod('User', 'GetHistory')
+  async getHistory(dto: GetHistoryRequestDto): Promise<GetHistoryResponseDto> {
+    return this.userService.getHistory(dto);
+  }
+
+  @UseGuards(GrpcAuthGuard)
+  @GrpcMethod('User', 'NightMode')
+  changeNightMode(data: NightModeRequestDto, meta: MetadataWithUser): Promise<GetEmptyDto> {
+    return this.userService.changeNightMode(data.nightMode, meta.user);
   }
 }

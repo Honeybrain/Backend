@@ -23,6 +23,9 @@ import { Status } from '@grpc/grpc-js/build/src/constants';
 import { RoleEnum } from './_utils/enums/role.enum';
 import { UserMapper } from './user.mapper';
 import { GetUserDto } from './_utils/dto/response/get-user.dto';
+import { GetHistoryRequestDto } from './_utils/dto/request/get-history-request.dto';
+import { GetHistoryResponseDto } from './_utils/dto/response/get-history-response.dto';
+import { HistoryRepository } from 'src/history/history.repository';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -33,6 +36,7 @@ export class UserService implements OnModuleInit {
     private readonly invitationsRepository: InvitationRepository,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
     private readonly userMapper: UserMapper,
+    private readonly historyRepository: HistoryRepository, 
   ) {}
 
   onModuleInit() {
@@ -156,4 +160,19 @@ export class UserService implements OnModuleInit {
   async getUserLanguage(user: UserDocument): Promise<UserLanguageResponseDto> {
     return { lan: user.lan };
   }
+
+  async getHistory(dto: GetHistoryRequestDto): Promise<GetHistoryResponseDto> {
+    const historyEntries = await this.historyRepository.getSortedHistory();
+    const entries = historyEntries.map(entry => ({
+      date: entry.date.toISOString(),
+      actionType: entry.actionType,
+      description: entry.description,
+    }));
+    return { entries };
+  }
+  
+  changeNightMode = (NightMode: boolean, user: UserDocument): Promise<GetEmptyDto> =>
+  this.usersRepository
+    .updateNightModeById(user._id, NightMode)
+    .then(() => ({ message: 'NightMode modifié avec succès !' })); 
 }
