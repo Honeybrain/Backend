@@ -98,7 +98,7 @@ export class UserRepository {
   
   updateNightModeById = (userId: Types.ObjectId, nightMode: boolean): Promise<UserDocument> =>
   this.model
-    .findByIdAndUpdate(userId, { nightMode }, { new: true })
+    .findByIdAndUpdate(userId, { nightMode: nightMode }, { new: true })
     .orFail(new RpcException({ code: status.NOT_FOUND, message: 'USER_NOT_FOUND' }))
     .exec();
 }

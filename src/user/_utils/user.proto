@@ -54,6 +54,7 @@ message UserDto {
   repeated RoleEnum roles = 3;
   bool activated = 4;
   string language = 5;
+  bool nightMode = 6;
 }
 
 message GetUsersResponse {
