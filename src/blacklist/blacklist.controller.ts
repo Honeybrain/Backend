@@ -12,6 +12,11 @@ import { BlockCountryRequestDto } from './_utils/dto/request/block-country-reque
 export class BlacklistController {
   constructor(private readonly blacklistService: BlacklistService) {}
 
+  @GrpcMethod('Blacklist', 'GetBlackListUnary')
+  getBlackListUnary() {
+    return this.blacklistService.getBlackListUnary();
+  }
+
   @GrpcMethod('Blacklist', 'GetBlackList')
   getBlacklist$(_data: unknown, _metadata: unknown, call: ServerUnaryCall<unknown, GetIdsDto>) {
     return this.blacklistService.getBlackList$(call);

@@ -53,6 +53,25 @@ export class BlacklistService {
       });
   }
 
+  async getBlackListUnary(): Promise<GetIdsDto> {
+    const filePath = '/app/honeypot/block.conf';
+    try {
+      const blockContent = await readFile(filePath, 'utf8');
+      const regex = /deny\s+((?:\d{1,3}\.){3}\d{1,3});/g;
+      const matches = blockContent.match(regex) || [];
+
+      const ips = matches.map((entry) => {
+        const ipRegex = /((?:\d{1,3}\.){3}\d{1,3})/;
+        const match = entry.match(ipRegex);
+        return match ? match[1] : null;
+      }).filter((ip) => ip !== null) as string[];
+
+      return { ips };
+    } catch (err) {
+      throw new RpcException(`Error reading block.conf: ${err}`);
+    }
+  }
+
   getBlackList$(call: ServerUnaryCall<unknown, GetIdsDto>) {
     const subject = new Subject<GetIdsDto>();
 
