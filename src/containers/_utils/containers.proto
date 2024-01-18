@@ -4,6 +4,7 @@ package containers;
 
 service Containers {
   rpc StreamContainers (ContainersRequest) returns (stream ContainersReply) {}
+  rpc GetContainers (ContainersRequest) returns (ContainersReply) {}
 }
 
 message ContainersRequest {}

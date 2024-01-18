@@ -7,6 +7,37 @@ import * as Docker from 'dockerode';
 export class ContainersService {
   private docker = new Docker();
 
+  private async getContainerData(): Promise<ContainersReplyDto> {
+    const network = await this.docker.getNetwork('honeypot_network').inspect();
+
+    const networkContainers = network.Containers;
+    const containerIds = Object.keys(networkContainers);
+
+    const containers = await this.docker.listContainers({ all: true });
+    const buildContainers = containers.filter((container) => container.Names[0].startsWith('/honeypot_'));
+
+    const containersData = buildContainers.map((container): Container => {
+      const networkContainerKey = containerIds.find((key) => key.startsWith(container.Id));
+      const networkContainer = networkContainerKey ? networkContainers[networkContainerKey] : undefined;
+
+      return {
+        ip: networkContainer ? networkContainer.IPv4Address.split('/')[0] : 'Not found',
+        name: container.Names[0].substring(1),
+        status: container.State,
+      };
+    });
+
+    return { containers: containersData };
+  }
+
+  public async getContainers(): Promise<ContainersReplyDto> {
+    try {
+      return await this.getContainerData();
+    } catch (error) {
+      throw new Error(`Error fetching container data: ${error}`);
+    }
+  }
+
   private async handleContainerEvent(subject: Subject<ContainersReplyDto>) {
     const network = await this.docker.getNetwork('honeypot_network').inspect();
 

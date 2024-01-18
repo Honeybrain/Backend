@@ -8,6 +8,11 @@ import { GrpcMethod } from '@nestjs/microservices';
 export class ContainersController {
   constructor(private readonly containersService: ContainersService) {}
 
+  @GrpcMethod('Containers', 'GetContainers')
+  getContainers() {
+    return this.containersService.getContainers();
+  }
+
   @GrpcMethod('Containers', 'StreamContainers')
   streamContainers() {
     return this.containersService.streamContainers();
