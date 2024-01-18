@@ -14,4 +14,9 @@ export class LogsController {
   streamLogs$(_data: unknown, _metadata: Metadata, call: ServerUnaryCall<unknown, LogReplyDto>) {
     return this.logsService.streamLogs$(call);
   }
+
+  @GrpcMethod('Logs', 'GetLogs')
+  getLogs() {
+    return this.logsService.getLogs();
+  }
 }

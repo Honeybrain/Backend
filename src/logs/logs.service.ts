@@ -9,6 +9,20 @@ import { RpcException } from '@nestjs/microservices';
 @Injectable()
 export class LogsService {
   private logger = new Logger(LogsService.name);
+  private logFilePath = '/app/honeypot/fast.log';
+
+  private async readLogFile(): Promise<LogReplyDto> {
+    try {
+      const logContent = await readFile(this.logFilePath, 'utf8');
+      return { content: logContent };
+    } catch (err) {
+      throw new RpcException(`Error reading log file: ${err}`);
+    }
+  }
+
+  public async getLogs(): Promise<LogReplyDto> {
+    return await this.readLogFile();
+  }
 
   private processFileChange(path: string, subject: Subject<LogReplyDto>) {
     readFile(path, 'utf8')

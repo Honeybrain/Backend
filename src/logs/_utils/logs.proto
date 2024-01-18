@@ -4,6 +4,7 @@ package logs;
 
 service Logs {
   rpc StreamLogs (LogRequest) returns (stream LogReply) {}
+  rpc GetLogs (LogRequest) returns (LogReply) {}
 }
 
 message LogRequest {}
