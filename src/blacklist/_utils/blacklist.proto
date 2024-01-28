@@ -8,6 +8,7 @@ service Blacklist {
   rpc GetBlackList (GetBlackListRequest) returns (stream GetBlackListReply) {}
   rpc GetBlackListUnary (GetBlackListRequest) returns (GetBlackListReply) {}
   rpc PutWhiteList (PutWhiteListRequest) returns (PutWhiteListReply) {}
+  rpc GetBlockCountry (GetBlockCountryRequest) returns (GetBlockCountryReply) {}
 }
 
 message PutBlackListRequest {
@@ -35,4 +36,14 @@ message PutWhiteListRequest {
 }
 
 message PutWhiteListReply {
+}
+
+message GetBlockCountryRequest {}
+
+message f {
+  repeated string ips = 1;
+}
+
+message GetBlockCountryReply {
+  repeated string countries = 1; 
 }
