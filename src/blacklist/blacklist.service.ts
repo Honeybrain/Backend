@@ -8,7 +8,7 @@ import * as Docker from 'dockerode';
 import { RpcException } from '@nestjs/microservices';
 import { readFile, writeFile } from 'fs/promises';
 import { HistoryRepository } from '../history/history.repository';
-
+import { GetBlockCountryReply } from './_utils/dto/response/get-block-country-reply.dto';
 
 @Injectable()
 export class BlacklistService {
@@ -151,6 +151,28 @@ export class BlacklistService {
 
     } catch (err) {
       throw new RpcException(`Error while updating the file: ${err}`);
+    }
+  }
+
+  async getBlockedCountries(): Promise<GetBlockCountryReply> {
+    const filePath = "/app/honeypot/geohostsdeny.conf";
+  
+    try {
+        const blockConf = await readFile(filePath, 'utf8');
+        const lines = blockConf.split('\n');
+        const countryListIndex = lines.findIndex(line => line.trim().startsWith('country_list ='));
+  
+        if (countryListIndex !== -1) {
+            const countryListParts = lines[countryListIndex].split('=');
+            const existingCountries = countryListParts[1].trim().split("|").filter(Boolean);
+            return { countries: existingCountries }; // Retourne la liste des pays
+        }
+  
+        // Si la liste des pays n'est pas trouvée, retourne un objet avec une liste vide
+        return { countries: [] };
+    } catch (err) {
+        console.error(`Error while reading the file: ${err}`);
+        throw new RpcException(`Error while reading the file: ${err}`);
     }
   }
 
