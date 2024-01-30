@@ -33,6 +33,11 @@ export class BlacklistController {
     return this.blacklistService.blockCountry(blockCountryRequestDto.countryCode);
   }
 
+  @GrpcMethod('Blacklist', 'UnblockCountry')
+  UnblockCountry(blockCountryRequestDto: BlockCountryRequestDto) {
+    return this.blacklistService.unblockCountry(blockCountryRequestDto.countryCode);
+  }
+
   @GrpcMethod('Blacklist', 'GetBlockCountry')
   getBlockCountry(_data: unknown, _metadata: unknown, call: ServerUnaryCall<unknown, GetBlockCountryReply>) {
     return this.blacklistService.getBlockedCountries();

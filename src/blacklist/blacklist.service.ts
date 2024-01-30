@@ -154,6 +154,30 @@ export class BlacklistService {
     }
   }
 
+  async unblockCountry(countryCode: string) {
+    if (!countryCode) throw new RpcException('countryCode is required');
+    const filePath = "/app/honeypot/geohostsdeny.conf";
+
+    try {
+        const blockConf = await readFile(filePath, 'utf8');
+        
+        const lines = blockConf.split('\n');
+        const countryListIndex = lines.findIndex(line => line.trim().startsWith('country_list ='));
+        if (countryListIndex !== -1) {
+            const countryListParts = lines[countryListIndex].split('=');
+            let existingCountries = countryListParts[1].trim().split("|").filter(Boolean);
+            existingCountries = existingCountries.filter(c => c !== countryCode);
+            lines[countryListIndex] = `country_list = ${existingCountries.join("|")}`;
+        }
+
+        await writeFile(filePath, lines.join('\n'), 'utf8');
+        await this.restartContainer("suricata");
+
+    } catch (err) {
+        throw new RpcException(`Error while updating the file: ${err}`);
+    }
+  }
+
   async getBlockedCountries(): Promise<GetBlockCountryReply> {
     const filePath = "/app/honeypot/geohostsdeny.conf";
   
