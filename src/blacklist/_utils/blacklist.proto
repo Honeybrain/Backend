@@ -40,10 +40,6 @@ message PutWhiteListReply {
 
 message GetBlockCountryRequest {}
 
-message f {
-  repeated string ips = 1;
-}
-
 message GetBlockCountryReply {
   repeated string countries = 1; 
 }
