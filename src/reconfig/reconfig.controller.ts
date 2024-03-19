@@ -2,16 +2,15 @@ import { ApiTags } from '@nestjs/swagger';
 import { Controller } from '@nestjs/common';
 import { ReConfigDto } from './_utils/dto/request/reconfig-request.dto';
 import { GrpcMethod } from '@nestjs/microservices';
-import { ReconfigureService } from './reconfig.service'
+import { ReconfigureService } from './reconfig.service';
 
-@Controller('reconfig')
-@ApiTags('ReconfigTag')
+@Controller('reconfigure')
+@ApiTags('Reconfigure')
+export class ReconfigureController {
+  constructor(private reconfigureService: ReconfigureService) {}
 
-export class ReconfigureController{
-    constructor(private reconfigureService: ReconfigureService){}
-
-    @GrpcMethod('Reconfigure', 'ReconfigHoneypot')
-    public async ReconfigHoneypot(ReconfigData: ReConfigDto) {
-      return this.reconfigureService.ReconfigHoneypot(ReconfigData);
-    }
+  @GrpcMethod('Reconfigure', 'ReconfigHoneypot')
+  reconfigHoneypot(ReconfigData: ReConfigDto) {
+    return this.reconfigureService.reconfigHoneypot(ReconfigData);
+  }
 }
