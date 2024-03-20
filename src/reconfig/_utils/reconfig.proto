@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package reconfigure;
+
+message ReconfigRequest {
+    string config = 1;
+}
+
+message ReconfigReply {
+}
+
+service Reconfigure {
+    rpc ReconfigHoneypot(ReconfigRequest) returns (ReconfigReply);
+}

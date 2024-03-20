@@ -5,7 +5,7 @@ export const grpcClientOptions: ClientOptions = {
   transport: Transport.GRPC,
   options: {
     url: process.env.GRPC_URL,
-    package: ['logs', 'dashboard', 'containers', 'blacklist', 'user', 'rules', 'mobile'], // proto package name
+    package: ['logs', 'dashboard', 'containers', 'blacklist', 'user', 'rules', 'mobile', 'reconfigure'], // proto package name
     protoPath: [
       './logs/_utils/logs.proto',
       './dashboard/_utils/dashboard.proto',
@@ -14,6 +14,7 @@ export const grpcClientOptions: ClientOptions = {
       './user/_utils/user.proto',
       './rules/_utils/rules.proto',
       './mobile/_utils/mobile.proto',
+      './reconfig/_utils/reconfig.proto',
     ].map((x) => join(__dirname, x)), // proto file path
   },
 };
