@@ -63,5 +63,10 @@ public async reconfigHoneypot(Reconfig: ReConfigDto) {
       console.log("running new dummy ftp on " + configJson.ftp.ip_address + " on port " + configJson.ftp.port);
     })
   }
+  
+  const generator = containers.filter((container)=> container.Names[0].startsWith('/generator'))
+  console.log(generator)
+  this.docker.getContainer(generator[0].Id).exec({Cmd: ['python3', 'generator.py'], AttachStdin: true, AttachStdout: true})
+
   }
 }
