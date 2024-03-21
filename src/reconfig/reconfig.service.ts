@@ -7,7 +7,6 @@ import { Container, Exec } from 'dockerode';
 import { promises as fs } from 'fs';
 import * as yaml from 'js-yaml';
 import { exec } from 'child_process';
-var DockerodeCompose = require('dockerode-compose')
 
 @Injectable()
 export class ReconfigureService {
